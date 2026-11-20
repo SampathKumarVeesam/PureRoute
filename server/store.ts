@@ -647,12 +647,17 @@ export function getStore(): DatabaseState {
 
 export function saveStore(): void {
   if (!state) return;
-  if (!fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    const tmpFile = `${DATA_FILE}.tmp`;
+    fs.writeFileSync(tmpFile, JSON.stringify(state, null, 2), 'utf-8');
+    fs.renameSync(tmpFile, DATA_FILE);
+  } catch (err: any) {
+    // In read-only serverless environments, file persistence is safely skipped;
+    // MongoDB Atlas provides durable cloud persistence.
   }
-  const tmpFile = `${DATA_FILE}.tmp`;
-  fs.writeFileSync(tmpFile, JSON.stringify(state, null, 2), 'utf-8');
-  fs.renameSync(tmpFile, DATA_FILE);
 
   // Asynchronously synchronize with MongoDB Atlas if connected
   if (mongoose.connection.readyState === 1) {

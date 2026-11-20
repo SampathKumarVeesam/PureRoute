@@ -1,6 +1,7 @@
 {
   "users": [
     {
+      "_id": "6b00308b3dc385741e559809",
       "id": "usr_customer_1",
       "email": "ananya@pureroute.in",
       "passwordHash": "$2b$10$382WQfyXAq0LuXmFbNazuO9UryoVIXMp42V5iL5jnVZbFyxlvg86W",
@@ -16,7 +17,9 @@
         "lng": 78.4071
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "merchantVerified": false,
       "isLoggedIn": true,
       "lastActiveAt": "2026-11-20T07:34:41.462Z",
       "fifoQueueJoinedAt": null,
@@ -25,9 +28,11 @@
       "walletBalance": 0,
       "completedDeliveries": 0,
       "createdAt": "2026-11-16T03:35:41.462Z",
-      "updatedAt": "2026-11-20T07:34:41.462Z"
+      "updatedAt": "2026-11-20T07:34:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b00308b3dc385741e55980a",
       "id": "usr_merchant_1",
       "email": "srinivas.farm@pureroute.in",
       "passwordHash": "$2b$10$Tno2gAyd3l1Waogf.gFNKe8GQDclHZaCri2JIRHOd3nhjVOdzjaaq",
@@ -36,8 +41,6 @@
       "gender": "Male",
       "avatarUrl": "preset:male-2",
       "role": "merchant",
-      "farmName": "Deccan Meadows Heritage Dairy",
-      "merchantVerified": true,
       "address": "Survey 118, Shamshabad Pasture Belt, Hyderabad, TG",
       "pinCode": "500077",
       "coordinates": {
@@ -45,7 +48,10 @@
         "lng": 78.4281
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "farmName": "Deccan Meadows Heritage Dairy",
+      "merchantVerified": true,
       "isLoggedIn": true,
       "lastActiveAt": "2026-11-20T07:33:41.462Z",
       "fifoQueueJoinedAt": null,
@@ -54,9 +60,11 @@
       "walletBalance": 18450,
       "completedDeliveries": 0,
       "createdAt": "2026-11-11T23:35:41.462Z",
-      "updatedAt": "2026-11-20T07:33:41.462Z"
+      "updatedAt": "2026-11-20T07:33:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b00308b3dc385741e55980b",
       "id": "usr_agent_1",
       "email": "ravi.agent@pureroute.in",
       "passwordHash": "$2b$10$eqhsqdfSmq7wMPoCkjXetembQeI8kUJiNoGJkHnDqXc1GiUvXJlDy",
@@ -76,7 +84,9 @@
         "lng": 78.3965
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "merchantVerified": false,
       "isLoggedIn": true,
       "lastActiveAt": "2026-11-20T07:34:41.462Z",
       "fifoQueueJoinedAt": "2026-11-20T06:05:41.462Z",
@@ -85,9 +95,11 @@
       "walletBalance": 1485,
       "completedDeliveries": 33,
       "createdAt": "2026-11-13T08:55:41.462Z",
-      "updatedAt": "2026-11-20T07:34:41.462Z"
+      "updatedAt": "2026-11-20T07:34:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b00308b3dc385741e55980c",
       "id": "usr_agent_2",
       "email": "priya.agent@pureroute.in",
       "passwordHash": "$2b$10$eqhsqdfSmq7wMPoCkjXetembQeI8kUJiNoGJkHnDqXc1GiUvXJlDy",
@@ -107,7 +119,9 @@
         "lng": 78.4142
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "merchantVerified": false,
       "isLoggedIn": true,
       "lastActiveAt": "2026-11-20T07:34:41.462Z",
       "fifoQueueJoinedAt": "2026-11-20T06:35:41.462Z",
@@ -116,9 +130,11 @@
       "walletBalance": 1125,
       "completedDeliveries": 25,
       "createdAt": "2026-11-14T01:35:41.462Z",
-      "updatedAt": "2026-11-20T07:34:41.462Z"
+      "updatedAt": "2026-11-20T07:34:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b00308b3dc385741e55980d",
       "id": "usr_agent_3",
       "email": "alex.agent@pureroute.in",
       "passwordHash": "$2b$10$eqhsqdfSmq7wMPoCkjXetembQeI8kUJiNoGJkHnDqXc1GiUvXJlDy",
@@ -138,7 +154,9 @@
         "lng": 78.3908
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "merchantVerified": false,
       "isLoggedIn": true,
       "lastActiveAt": "2026-11-20T07:33:41.462Z",
       "fifoQueueJoinedAt": "2026-11-20T07:05:41.462Z",
@@ -147,9 +165,11 @@
       "walletBalance": 810,
       "completedDeliveries": 18,
       "createdAt": "2026-11-14T18:15:41.462Z",
-      "updatedAt": "2026-11-20T07:33:41.462Z"
+      "updatedAt": "2026-11-20T07:33:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b00308b3dc385741e55980e",
       "id": "usr_agent_4",
       "email": "kiran.agent@pureroute.in",
       "passwordHash": "$2b$10$eqhsqdfSmq7wMPoCkjXetembQeI8kUJiNoGJkHnDqXc1GiUvXJlDy",
@@ -169,7 +189,9 @@
         "lng": 78.4608
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "merchantVerified": false,
       "isLoggedIn": false,
       "lastActiveAt": "2026-11-20T05:35:41.462Z",
       "fifoQueueJoinedAt": null,
@@ -178,9 +200,11 @@
       "walletBalance": 630,
       "completedDeliveries": 14,
       "createdAt": "2026-11-15T02:35:41.462Z",
-      "updatedAt": "2026-11-20T05:35:41.462Z"
+      "updatedAt": "2026-11-20T05:35:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b00308b3dc385741e55980f",
       "id": "usr_admin_1",
       "email": "admin@pureroute.in",
       "passwordHash": "$2b$10$YbABQyWnwrtCzq.3cVmp6OD2IVxfakUi55hHFwscFz8vNPcJLrg8m",
@@ -196,7 +220,9 @@
         "lng": 78.3908
       },
       "isEmailVerified": true,
+      "emailVerificationToken": null,
       "mustChangePassword": false,
+      "merchantVerified": false,
       "isLoggedIn": true,
       "lastActiveAt": "2026-11-20T07:35:41.462Z",
       "fifoQueueJoinedAt": null,
@@ -205,11 +231,40 @@
       "walletBalance": 0,
       "completedDeliveries": 0,
       "createdAt": "2026-11-09T21:35:41.462Z",
-      "updatedAt": "2026-11-20T07:35:41.462Z"
+      "updatedAt": "2026-11-20T07:35:41.462Z",
+      "__v": 0
+    },
+    {
+      "id": "usr_customer_cfff49cf",
+      "email": "test_1795179951515@pureroute.in",
+      "passwordHash": "$2b$10$kkJ20AEXjW9QHkBt.hcrIe7To6rj0NppCh3twChOcF395oUXwt0/S",
+      "name": "Netlify Test User",
+      "phone": "+919848099887",
+      "gender": "Female",
+      "avatarUrl": "preset:female-1",
+      "role": "customer",
+      "address": "Hyderabad, TG",
+      "pinCode": "500081",
+      "coordinates": {
+        "lat": 17.4486,
+        "lng": 78.3908
+      },
+      "isEmailVerified": true,
+      "mustChangePassword": false,
+      "isLoggedIn": true,
+      "lastActiveAt": "2026-11-20T13:05:53.528Z",
+      "fifoQueueJoinedAt": null,
+      "hasPendingCashDeposit": false,
+      "pendingCashAmount": 0,
+      "walletBalance": 0,
+      "completedDeliveries": 0,
+      "createdAt": "2026-11-20T13:05:53.528Z",
+      "updatedAt": "2026-11-20T13:05:53.528Z"
     }
   ],
   "products": [
     {
+      "_id": "6b00308b3dc385741e559810",
       "id": 101,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -226,9 +281,13 @@
       "description": "Single-origin Murrah buffalo milk from grass-fed Telangana pastures. Unhomogenized, zero preservatives, thick natural malai layer.",
       "supportsSubscription": true,
       "ratingAvg": 4.9,
-      "reviewCount": 42
+      "reviewCount": 42,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.877Z",
+      "updatedAt": "2026-11-20T11:35:39.877Z"
     },
     {
+      "_id": "6b00308b3dc385741e559811",
       "id": 102,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -245,9 +304,13 @@
       "description": "Same rich single-origin morning buffalo milk bottled in a convenient 500 ml returnable glass vessel for smaller households.",
       "supportsSubscription": true,
       "ratingAvg": 4.8,
-      "reviewCount": 29
+      "reviewCount": 29,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.877Z",
+      "updatedAt": "2026-11-20T11:35:39.877Z"
     },
     {
+      "_id": "6b00308b3dc385741e559812",
       "id": 103,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -264,9 +327,13 @@
       "description": "Pure A2 beta-casein milk from free-grazing indigenous Gir cows. Naturally light, golden-hued, and gentle on digestion.",
       "supportsSubscription": true,
       "ratingAvg": 4.9,
-      "reviewCount": 54
+      "reviewCount": 54,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.877Z",
+      "updatedAt": "2026-11-20T11:35:39.877Z"
     },
     {
+      "_id": "6b00308b3dc385741e559813",
       "id": 104,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -283,9 +350,13 @@
       "description": "Velvety, naturally sweet probiotic curd cultured overnight in unglazed clay pots using heirloom starter culture.",
       "supportsSubscription": true,
       "ratingAvg": 4.9,
-      "reviewCount": 31
+      "reviewCount": 31,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.878Z",
+      "updatedAt": "2026-11-20T11:35:39.878Z"
     },
     {
+      "_id": "6b00308b3dc385741e559814",
       "id": 105,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -302,9 +373,13 @@
       "description": "Cloud-soft cottage cheese hand-pressed from morning buffalo milk with organic lime whey—holds shape cleanly on high heat.",
       "supportsSubscription": false,
       "ratingAvg": 4.8,
-      "reviewCount": 24
+      "reviewCount": 24,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.878Z",
+      "updatedAt": "2026-11-20T11:35:39.878Z"
     },
     {
+      "_id": "6b00308b3dc385741e559815",
       "id": 106,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -321,9 +396,13 @@
       "description": "Aromatic granular ghee slow-simmered from cultured A2 Gir cow curd butter over gentle wood-ember warmth.",
       "supportsSubscription": false,
       "ratingAvg": 5,
-      "reviewCount": 38
+      "reviewCount": 38,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.878Z",
+      "updatedAt": "2026-11-20T11:35:39.878Z"
     },
     {
+      "_id": "6b00308b3dc385741e559816",
       "id": 107,
       "merchantId": "usr_merchant_1",
       "merchantName": "Deccan Meadows Heritage Dairy",
@@ -340,11 +419,15 @@
       "description": "Cooling Hyderabad-style spiced buttermilk hand-churned from fresh curd with toasted cumin, Himalayan pink salt, and tender curry leaves.",
       "supportsSubscription": true,
       "ratingAvg": 4.7,
-      "reviewCount": 19
+      "reviewCount": 19,
+      "__v": 0,
+      "createdAt": "2026-11-20T11:35:39.878Z",
+      "updatedAt": "2026-11-20T11:35:39.878Z"
     }
   ],
   "orders": [
     {
+      "_id": "6b0030d5b24eac8c3a4a8ed4",
       "id": "ord_live_1001",
       "orderNumber": "PR-HYD-1001",
       "customerId": "usr_customer_1",
@@ -366,7 +449,8 @@
           "unit": "1 Litre Carafe",
           "quantity": 2,
           "priceInr": 115,
-          "imageUrl": "/src/assets/images/product_a2_cow_milk_1795152909986.jpg"
+          "imageUrl": "/src/assets/images/product_a2_cow_milk_1795152909986.jpg",
+          "_id": "6b0030d5b24eac8c3a4a8ed5"
         },
         {
           "productId": 104,
@@ -374,7 +458,8 @@
           "unit": "500 g Clay Pot",
           "quantity": 1,
           "priceInr": 78,
-          "imageUrl": "/src/assets/images/product_curd_paneer_1795152909468.jpg"
+          "imageUrl": "/src/assets/images/product_curd_paneer_1795152909468.jpg",
+          "_id": "6b0030d5b24eac8c3a4a8ed6"
         }
       ],
       "subtotalInr": 308,
@@ -405,9 +490,11 @@
       "feedbackDontAskAgain": false,
       "lastFeedbackPromptAt": null,
       "createdAt": "2026-11-20T07:10:41.462Z",
-      "updatedAt": "2026-11-20T07:23:41.462Z"
+      "updatedAt": "2026-11-20T07:23:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b0030d5b24eac8c3a4a8ed7",
       "id": "ord_proc_1002",
       "orderNumber": "PR-HYD-1002",
       "customerId": "usr_customer_1",
@@ -429,7 +516,8 @@
           "unit": "1 Litre Glass Bottle",
           "quantity": 2,
           "priceInr": 92,
-          "imageUrl": "/src/assets/images/product_buffalo_milk_1795152909255.jpg"
+          "imageUrl": "/src/assets/images/product_buffalo_milk_1795152909255.jpg",
+          "_id": "6b0030d5b24eac8c3a4a8ed8"
         },
         {
           "productId": 105,
@@ -437,7 +525,8 @@
           "unit": "250 g Vacuum Pack",
           "quantity": 1,
           "priceInr": 125,
-          "imageUrl": "/src/assets/images/product_curd_paneer_1795152909468.jpg"
+          "imageUrl": "/src/assets/images/product_curd_paneer_1795152909468.jpg",
+          "_id": "6b0030d5b24eac8c3a4a8ed9"
         }
       ],
       "subtotalInr": 309,
@@ -468,9 +557,11 @@
       "feedbackDontAskAgain": false,
       "lastFeedbackPromptAt": null,
       "createdAt": "2026-11-20T07:27:41.462Z",
-      "updatedAt": "2026-11-20T07:27:41.462Z"
+      "updatedAt": "2026-11-20T07:27:41.462Z",
+      "__v": 0
     },
     {
+      "_id": "6b0030d5b24eac8c3a4a8eda",
       "id": "ord_deliv_1000",
       "orderNumber": "PR-HYD-1000",
       "customerId": "usr_customer_1",
@@ -493,7 +584,8 @@
           "unit": "1 Litre Glass Bottle",
           "quantity": 1,
           "priceInr": 92,
-          "imageUrl": "/src/assets/images/product_buffalo_milk_1795152909255.jpg"
+          "imageUrl": "/src/assets/images/product_buffalo_milk_1795152909255.jpg",
+          "_id": "6b0030d5b24eac8c3a4a8edb"
         }
       ],
       "subtotalInr": 92,
@@ -524,11 +616,13 @@
       "feedbackDontAskAgain": false,
       "lastFeedbackPromptAt": null,
       "createdAt": "2026-11-20T05:45:41.462Z",
-      "updatedAt": "2026-11-20T07:13:41.462Z"
+      "updatedAt": "2026-11-20T07:13:41.462Z",
+      "__v": 0
     }
   ],
   "reviews": [
     {
+      "_id": "6b0030d5b24eac8c3a4a8edd",
       "id": "rev_1",
       "orderId": "ord_seed_prev_1",
       "productId": 103,
@@ -537,9 +631,12 @@
       "customerAvatarUrl": "preset:female-1",
       "rating": 5,
       "comment": "Arrived chilled at 6:05 AM in Jubilee Hills. Naturally sweet A2 milk with zero smell—our morning filter coffee tastes noticeably richer.",
-      "createdAt": "2026-11-19T07:35:41.462Z"
+      "createdAt": "2026-11-19T07:35:41.462Z",
+      "__v": 0,
+      "updatedAt": "2026-11-20T11:36:53.215Z"
     },
     {
+      "_id": "6b0030d5b24eac8c3a4a8ede",
       "id": "rev_2",
       "orderId": "ord_seed_prev_2",
       "productId": 101,
@@ -548,11 +645,14 @@
       "customerAvatarUrl": "preset:male-1",
       "rating": 5,
       "comment": "Thick golden cream layer every single morning. Love that the sealed glass bottle is chilled right from the Madhapur hub.",
-      "createdAt": "2026-11-18T07:35:41.462Z"
+      "createdAt": "2026-11-18T07:35:41.462Z",
+      "__v": 0,
+      "updatedAt": "2026-11-20T11:36:53.215Z"
     }
   ],
   "subscriptions": [
     {
+      "_id": "6b0030d5b24eac8c3a4a8edc",
       "id": "sub_1",
       "customerId": "usr_customer_1",
       "productId": 101,
@@ -564,7 +664,9 @@
       "frequency": "Daily",
       "status": "ACTIVE",
       "nextDeliveryDate": "2026-11-21",
-      "createdAt": "2026-11-17T07:35:41.462Z"
+      "createdAt": "2026-11-17T07:35:41.462Z",
+      "__v": 0,
+      "updatedAt": "2026-11-20T11:36:53.152Z"
     }
   ],
   "emailLogs": [],
