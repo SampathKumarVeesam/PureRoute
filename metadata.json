@@ -1,0 +1,6 @@
+{
+  "name": "PureRoute — LocalMilkforYou Hyderabad",
+  "description": "Farm-direct Hyderabad dairy marketplace with interactive WebGL2 water ripple hero, four role portals, FIFO active-agent dispatch, universal OTP confirmation, UPI QR & cash deposit lockout, live Leaflet tracking, and OpenAPI 3.0 Swagger.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}

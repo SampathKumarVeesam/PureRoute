@@ -1,0 +1,173 @@
+@import "tailwindcss";
+@import "leaflet/dist/leaflet.css";
+
+@layer base {
+  :root {
+    --font-serif: 'Playfair Display', Georgia, serif;
+    --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+    --font-mono: 'JetBrains Mono', ui-monospace, monospace;
+    --canvas-obsidian: #060d14;
+    --surface-glass: rgba(10, 20, 30, 0.74);
+    --surface-elevated: rgba(15, 28, 41, 0.84);
+    --hairline-gold: rgba(224, 198, 152, 0.16);
+    --hairline-soft: rgba(255, 255, 255, 0.09);
+    --accent-brass: #d8b06c;
+    --accent-brass-hover: #e7c68b;
+  }
+
+  html {
+    font-family: var(--font-sans);
+    background-color: #060d14;
+    color: #f3efe8;
+    scroll-behavior: smooth;
+  }
+}
+
+.font-editorial {
+  font-family: var(--font-serif);
+}
+
+.font-mono-tabular {
+  font-family: var(--font-mono);
+  font-variant-numeric: tabular-nums;
+}
+
+.tabular-nums {
+  font-variant-numeric: tabular-nums;
+}
+
+/* Classic Architectural Frosted Glass Surfaces */
+.glass-panel {
+  background: rgba(9, 19, 29, 0.76);
+  backdrop-filter: blur(20px);
+  -webkit-backdrop-filter: blur(20px);
+  border: 1px solid rgba(228, 204, 162, 0.15);
+}
+
+.glass-panel-soft {
+  background: rgba(12, 24, 36, 0.56);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+/* Classic Brass Primary Action */
+.btn-brass {
+  background-color: #d8b06c;
+  color: #081119;
+  font-weight: 600;
+  transition: background-color 180ms ease, transform 180ms ease;
+}
+
+.btn-brass:hover:not(:disabled) {
+  background-color: #e7c68b;
+}
+
+.btn-brass:disabled {
+  opacity: 0.45;
+  cursor: not-allowed;
+}
+
+/* Classic Outline Action */
+.btn-outline-classic {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(228, 204, 162, 0.22);
+  color: #f3efe8;
+  transition: background-color 180ms ease, border-color 180ms ease, color 180ms ease;
+}
+
+.btn-outline-classic:hover:not(:disabled) {
+  background: rgba(228, 204, 162, 0.11);
+  border-color: rgba(228, 204, 162, 0.42);
+  color: #ffffff;
+}
+
+/* Refined Editorial Inputs */
+.classic-input {
+  background: rgba(6, 13, 20, 0.68);
+  border: 1px solid rgba(228, 204, 162, 0.18);
+  color: #f8f5ef;
+  transition: border-color 180ms ease, background-color 180ms ease;
+}
+
+.classic-input:focus {
+  outline: none;
+  border-color: #d8b06c;
+  background: rgba(8, 17, 26, 0.9);
+}
+
+/* Subtle Ambient Refracted Dawn Backdrop for Inner Pages */
+.inner-atmosphere {
+  position: relative;
+  background-color: #060d14;
+}
+
+.inner-atmosphere::before {
+  content: '';
+  position: fixed;
+  inset: 0;
+  background-image:
+    radial-gradient(circle at 82% 8%, rgba(216, 176, 108, 0.13) 0%, transparent 44%),
+    radial-gradient(circle at 14% 28%, rgba(28, 86, 114, 0.18) 0%, transparent 52%),
+    linear-gradient(180deg, rgba(6, 13, 20, 0.84) 0%, rgba(6, 13, 20, 0.96) 55%, #050b11 100%),
+    url('/src/assets/images/hero_morning_water_dew_1795152909340.jpg');
+  background-size: cover;
+  background-position: center top;
+  background-attachment: fixed;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.inner-atmosphere > * {
+  position: relative;
+  z-index: 1;
+}
+
+/* Hero Top-Right Frosted-Glass Nav Link Spec (Unchanged per user request) */
+.hero-nav-link {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 400;
+  letter-spacing: 0.03em;
+  padding: 6px 2px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.35);
+  border-radius: 6px;
+  transition: background-color 250ms ease, backdrop-filter 250ms ease, padding 250ms ease, border-color 250ms ease, color 250ms ease;
+  white-space: nowrap;
+  flex-shrink: 0;
+}
+
+.hero-nav-link:hover,
+.hero-nav-link:focus-visible {
+  background: rgba(255, 255, 255, 0.16);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border-bottom-color: transparent;
+  padding: 6px 14px;
+  outline: none;
+}
+
+/* Cartographic Dark Leaflet Styling */
+.leaflet-container {
+  background: #08121c !important;
+  font-family: var(--font-sans) !important;
+  z-index: 1;
+}
+
+.leaflet-tile-pane {
+  filter: brightness(0.8) contrast(1.08) saturate(0.75) sepia(0.08);
+}
+
+.leaflet-popup-content-wrapper,
+.leaflet-popup-tip {
+  background: rgba(9, 19, 29, 0.96) !important;
+  color: #f3efe8 !important;
+  border: 1px solid rgba(228, 204, 162, 0.24);
+  backdrop-filter: blur(12px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
