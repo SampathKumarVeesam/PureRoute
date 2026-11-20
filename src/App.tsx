@@ -1,5 +1,5 @@
 import React, { useCallback, useEffect, useState } from 'react';
-import { ArrowRight, LogOut, UserCog } from 'lucide-react';
+import { ArrowRight, ChevronDown, ChevronUp, Lock, LogOut, Sparkles, UserCog } from 'lucide-react';
 import { api, getAuthToken, setAuthToken } from './lib/api';
 import { resolveAvatarSrc } from './lib/avatars';
 import { WaterRippleHero } from './components/WaterRippleHero';
@@ -62,7 +62,10 @@ interface RoleGateProps {
   pillars: { num: string; heading: string; detail: string }[];
   credentialHint: string;
   ctaLabel: string;
+  defaultEmail?: string;
+  defaultPassword?: string;
   onSignIn: () => void;
+  onAuthenticated?: (user: PublicUser) => void;
 }
 
 const ClassicRoleGate: React.FC<RoleGateProps> = ({
@@ -72,62 +75,175 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
   pillars,
   credentialHint,
   ctaLabel,
+  defaultEmail = '',
+  defaultPassword = '',
   onSignIn,
-}) => (
-  <section className="max-w-6xl mx-auto px-6 md:px-10 py-14 md:py-20">
-    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-stretch">
-      <div className="lg:col-span-7 flex flex-col justify-between space-y-8">
-        <div>
-          <p className="text-[11px] uppercase tracking-[0.24em] text-[#d8b06c]">{chapter}</p>
-          <h1
-            className="mt-3 font-editorial text-4xl md:text-5xl text-[#f8f5ef] font-medium leading-[1.08]"
-            style={{ textWrap: 'balance' }}
-          >
-            {title}
-          </h1>
-          <p className="mt-4 text-sm md:text-base text-[#b7c0c9] leading-relaxed max-w-xl">{subtitle}</p>
-        </div>
+  onAuthenticated,
+}) => {
+  const [isRolledDown, setIsRolledDown] = useState(false);
+  const [email, setEmail] = useState(defaultEmail);
+  const [password, setPassword] = useState(defaultPassword);
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
-        <div className="border-t border-[#e4cca2]/15 divide-y divide-[#e4cca2]/12">
-          {pillars.map((p) => (
-            <div key={p.num} className="py-4 grid grid-cols-12 gap-4 items-baseline">
-              <span className="col-span-2 font-mono-tabular text-xs text-[#d8b06c]">{p.num}</span>
-              <div className="col-span-10">
-                <h2 className="text-sm font-medium text-[#f8f5ef]">{p.heading}</h2>
-                <p className="mt-1 text-xs text-[#9aa4ae] leading-relaxed">{p.detail}</p>
+  const handleInlineSignIn = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email || !password) return;
+    setError(null);
+    setBusy(true);
+    try {
+      const res = await api.login(email, password);
+      setAuthToken(res.token);
+      if (onAuthenticated) {
+        onAuthenticated(res.user);
+      }
+    } catch (err: any) {
+      setError(err.message || 'Authentication failed. Please check credentials.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleFillDemo = () => {
+    setEmail(defaultEmail);
+    setPassword(defaultPassword);
+    setError(null);
+  };
+
+  return (
+    <section className="max-w-6xl mx-auto px-6 md:px-10 py-14 md:py-20">
+      <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-14 items-stretch">
+        <div className="lg:col-span-7 flex flex-col justify-between space-y-8">
+          <div>
+            <p className="text-[11px] uppercase tracking-[0.24em] text-[#d8b06c]">{chapter}</p>
+            <h1
+              className="mt-3 font-editorial text-4xl md:text-5xl text-[#f8f5ef] font-medium leading-[1.08]"
+              style={{ textWrap: 'balance' }}
+            >
+              {title}
+            </h1>
+            <p className="mt-4 text-sm md:text-base text-[#b7c0c9] leading-relaxed max-w-xl">{subtitle}</p>
+          </div>
+
+          <div className="border-t border-[#e4cca2]/15 divide-y divide-[#e4cca2]/12">
+            {pillars.map((p) => (
+              <div key={p.num} className="py-4 grid grid-cols-12 gap-4 items-baseline">
+                <span className="col-span-2 font-mono-tabular text-xs text-[#d8b06c]">{p.num}</span>
+                <div className="col-span-10">
+                  <h2 className="text-sm font-medium text-[#f8f5ef]">{p.heading}</h2>
+                  <p className="mt-1 text-xs text-[#9aa4ae] leading-relaxed">{p.detail}</p>
+                </div>
               </div>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      <div className="lg:col-span-5 glass-panel rounded-md p-8 flex flex-col justify-between gap-8">
-        <div className="space-y-4">
-          <p className="text-[11px] uppercase tracking-[0.22em] text-[#d8b06c]">Authorized Portal Access</p>
-          <h2 className="font-editorial text-2xl text-white">Sign In to Continue</h2>
-          <p className="text-sm text-[#aeb7c0] leading-relaxed">
-            Access requires verified PureRoute Hyderabad credentials. Use the quick-fill directory inside the sign-in sheet to test this role immediately.
-          </p>
-          <div className="pt-4 border-t border-[#e4cca2]/15 space-y-1.5">
-            <span className="block text-[11px] uppercase tracking-[0.16em] text-[#9aa4ae]">
-              Seeded Hyderabad Account
-            </span>
-            <p className="font-mono-tabular text-xs text-[#f3efe8]">{credentialHint}</p>
+            ))}
           </div>
         </div>
 
-        <button
-          type="button"
-          onClick={onSignIn}
-          className="w-full inline-flex items-center justify-between px-5 py-3.5 rounded-sm btn-brass text-xs uppercase tracking-[0.14em] cursor-pointer"
-        >
-          <span>{ctaLabel}</span>
-          <ArrowRight className="w-4 h-4" />
-        </button>
+        <div className="lg:col-span-5 glass-panel rounded-md p-8 flex flex-col justify-between gap-6">
+          <div className="space-y-4">
+            <div className="flex items-center justify-between">
+              <p className="text-[11px] uppercase tracking-[0.22em] text-[#d8b06c]">Authorized Portal Access</p>
+              {isRolledDown && (
+                <span className="text-[10px] uppercase tracking-wider text-emerald-400 bg-emerald-500/15 border border-emerald-500/30 px-2 py-0.5 rounded-sm">
+                  Sign In Form Active
+                </span>
+              )}
+            </div>
+            <h2 className="font-editorial text-2xl text-white">Sign In to Continue</h2>
+            <p className="text-sm text-[#aeb7c0] leading-relaxed">
+              Access requires verified PureRoute credentials. Click below to roll down the instant sign-in form or fill demo credentials.
+            </p>
+            <div className="pt-3 border-t border-[#e4cca2]/15 space-y-1.5">
+              <span className="block text-[11px] uppercase tracking-[0.16em] text-[#9aa4ae]">
+                Seeded Hyderabad Account
+              </span>
+              <p className="font-mono-tabular text-xs text-[#f3efe8] select-all">{credentialHint}</p>
+            </div>
+          </div>
+
+          {/* Roll Down Sign In Toggle Button */}
+          <button
+            type="button"
+            onClick={() => setIsRolledDown((prev) => !prev)}
+            className="w-full inline-flex items-center justify-between px-5 py-3.5 rounded-sm btn-brass text-xs uppercase tracking-[0.14em] cursor-pointer transition-all"
+          >
+            <span>{isRolledDown ? 'Hide Sign In Form' : ctaLabel}</span>
+            {isRolledDown ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+          </button>
+
+          {/* Rolled Down Sign In Form with Smooth CSS Transition */}
+          <div
+            className={`transition-all duration-500 ease-in-out overflow-hidden ${
+              isRolledDown ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
+            }`}
+          >
+            <form onSubmit={handleInlineSignIn} className="pt-4 border-t border-[#e4cca2]/15 space-y-3.5">
+              {error && (
+                <div className="rounded-sm bg-rose-500/15 border border-rose-400/40 p-2.5 text-xs text-rose-200">
+                  {error}
+                </div>
+              )}
+
+              <div>
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] uppercase tracking-[0.12em] text-[#a5b0ba]">Account Email</label>
+                  {defaultEmail && (
+                    <button
+                      type="button"
+                      onClick={handleFillDemo}
+                      className="text-[10px] text-[#d8b06c] hover:underline inline-flex items-center gap-1 cursor-pointer"
+                    >
+                      <Sparkles className="w-3 h-3" />
+                      Quick Fill Demo
+                    </button>
+                  )}
+                </div>
+                <input
+                  type="email"
+                  required
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="name@pureroute.in"
+                  className="w-full rounded-sm classic-input px-3.5 py-2.5 text-xs font-mono"
+                />
+              </div>
+
+              <div>
+                <label className="block text-[11px] uppercase tracking-[0.12em] text-[#a5b0ba] mb-1">Password</label>
+                <input
+                  type="password"
+                  required
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••••••"
+                  className="w-full rounded-sm classic-input px-3.5 py-2.5 text-xs font-mono"
+                />
+              </div>
+
+              <button
+                type="submit"
+                disabled={busy}
+                className="w-full inline-flex items-center justify-center gap-2 px-5 py-3 rounded-sm btn-brass text-xs uppercase tracking-[0.14em] cursor-pointer"
+              >
+                <Lock className="w-3.5 h-3.5" />
+                <span>{busy ? 'Authenticating...' : 'Sign In to Portal'}</span>
+              </button>
+
+              <div className="pt-2 text-center">
+                <button
+                  type="button"
+                  onClick={onSignIn}
+                  className="text-[11px] text-[#8e9ba6] hover:text-[#d8b06c] transition-colors underline cursor-pointer"
+                >
+                  Or open modal sheet / register new account
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
       </div>
-    </div>
-  </section>
-);
+    </section>
+  );
+};
 
 function PureRouteShell() {
   const [view, setView] = useState<ActiveView>('hero');
@@ -470,7 +586,10 @@ function PureRouteShell() {
               ]}
               credentialHint="ravi.agent@pureroute.in / AgentHyd@2026 (or register via 2-Step Brevo Verification)"
               ctaLabel="Sign In or Register as Delivery Agent"
+              defaultEmail="ravi.agent@pureroute.in"
+              defaultPassword="AgentHyd@2026"
               onSignIn={() => setModalMode('auth')}
+              onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
 
@@ -504,7 +623,10 @@ function PureRouteShell() {
               ]}
               credentialHint="srinivas.farm@pureroute.in / FarmFresh@2026 (Deccan Meadows Heritage Dairy)"
               ctaLabel="Sign In to Farm Partner Portal"
+              defaultEmail="srinivas.farm@pureroute.in"
+              defaultPassword="FarmFresh@2026"
               onSignIn={() => setModalMode('auth')}
+              onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
 
@@ -535,7 +657,10 @@ function PureRouteShell() {
               ]}
               credentialHint="admin@pureroute.in / AdminHyd@2026"
               ctaLabel="Sign In to Operations Command"
+              defaultEmail="admin@pureroute.in"
+              defaultPassword="AdminHyd@2026"
               onSignIn={() => setModalMode('auth')}
+              onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
       </main>

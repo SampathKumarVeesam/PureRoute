@@ -196,7 +196,7 @@ export interface EmailDispatchLog {
   toName: string;
   subject: string;
   htmlContent: string;
-  provider: 'BREVO_LIVE' | 'BREVO_SANDBOX_OUTBOX';
+  provider: 'ZOHO_SMTP' | 'SMTP_LIVE' | 'BREVO_LIVE' | 'BREVO_SANDBOX_OUTBOX';
   statusCode: number;
   sentAt: string;
   meta?: Record<string, string>;

@@ -25,7 +25,15 @@ import {
   saveStore,
 } from './store.ts';
 import { connectToDatabase, getDatabaseHealth, seedDatabaseIfEmpty } from './database.ts';
-import { sendBrevoTransactionalEmail } from './brevo.ts';
+import {
+  sendTransactionalEmail,
+  sendBrevoTransactionalEmail,
+  templateWelcomeUser,
+  templateOrderPlacedCustomer,
+  templateMerchantOrderAlert,
+  templateOrderDispatched,
+  templateOrderDelivered,
+} from './email.ts';
 import { openApiSpec } from './openapi.ts';
 
 dotenv.config();
@@ -184,6 +192,19 @@ export function checkAndExpireFifoOrders(): void {
 
 export function startFifoExpirationWatcher(): NodeJS.Timeout {
   return setInterval(checkAndExpireFifoOrders, 15_000);
+}
+
+function optionalAuth(req: AuthedRequest): UserRecord | null {
+  const authHeader = req.headers.authorization;
+  if (!authHeader || !authHeader.startsWith('Bearer ')) return null;
+  const token = authHeader.slice(7);
+  try {
+    const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
+    const store = getStore();
+    return store.users.find((u) => u.id === payload.userId) || null;
+  } catch {
+    return null;
+  }
 }
 
 function requireAuth(roles?: UserRole[]) {
@@ -424,6 +445,17 @@ export function createApp(): express.Application {
 
       store.users.push(newUser);
       saveStore();
+
+      // Dispatch welcome notification via Zoho SMTP
+      sendTransactionalEmail(
+        {
+          toEmail: cleanEmail,
+          toName: newUser.name,
+          subject: `Welcome to PureRoute LocalMilk Hyderabad, ${newUser.name}!`,
+          htmlContent: templateWelcomeUser(newUser.name, validRole, cleanEmail),
+        },
+        recordEmail
+      ).catch((e) => console.warn('Welcome email error:', e));
 
       const token = signToken(newUser);
       return res.status(201).json({
@@ -689,9 +721,13 @@ export function createApp(): express.Application {
     res.json(prod);
   });
 
-  app.get('/api/subscriptions', requireAuth(['customer']), (req: AuthedRequest, res: Response) => {
+  app.get('/api/subscriptions', (req: AuthedRequest, res: Response) => {
+    const user = optionalAuth(req);
+    if (!user) {
+      return res.json([]);
+    }
     const store = getStore();
-    const subs = store.subscriptions.filter((s) => s.customerId === req.currentUser!.id);
+    const subs = store.subscriptions.filter((s) => s.customerId === user.id);
     res.json(subs);
   });
 
@@ -725,13 +761,17 @@ export function createApp(): express.Application {
     res.status(201).json(newSub);
   });
 
-  app.patch('/api/subscriptions/:id', requireAuth(['customer']), (req: AuthedRequest, res: Response) => {
+  app.patch(['/api/subscriptions/:id', '/api/subscriptions/:id/toggle'], requireAuth(['customer']), (req: AuthedRequest, res: Response) => {
     const store = getStore();
     const sub = store.subscriptions.find((s) => s.id === req.params.id && s.customerId === req.currentUser!.id);
     if (!sub) return res.status(404).json({ error: 'Subscription not found' });
 
     const { status, quantity, slot } = req.body || {};
-    if (status && ['ACTIVE', 'PAUSED'].includes(status)) sub.status = status;
+    if (req.path.endsWith('/toggle')) {
+      sub.status = sub.status === 'ACTIVE' ? 'PAUSED' : 'ACTIVE';
+    } else if (status && ['ACTIVE', 'PAUSED'].includes(status)) {
+      sub.status = status;
+    }
     if (quantity) sub.quantity = Math.max(1, Number(quantity));
     if (slot) sub.slot = slot;
 
@@ -739,13 +779,20 @@ export function createApp(): express.Application {
     res.json(sub);
   });
 
-  app.get('/api/orders/my-orders', requireAuth(['customer']), (req: AuthedRequest, res: Response) => {
+  app.get(['/api/orders', '/api/orders/my-orders'], (req: AuthedRequest, res: Response) => {
+    const user = optionalAuth(req);
+    if (!user) {
+      return res.json([]);
+    }
     const store = getStore();
-    const orders = store.orders.filter((o) => o.customerId === req.currentUser!.id);
+    if (user.role === 'admin') {
+      return res.json(store.orders);
+    }
+    const orders = store.orders.filter((o) => o.customerId === user.id);
     res.json(orders);
   });
 
-  app.post('/api/orders/checkout', requireAuth(['customer']), async (req: AuthedRequest, res: Response) => {
+  app.post(['/api/orders', '/api/orders/checkout'], requireAuth(['customer', 'admin']), async (req: AuthedRequest, res: Response) => {
     try {
       const user = req.currentUser!;
       const { items, paymentMethod, deliveryAddress, pinCode, deliverySlot, isSubscription, subscriptionFrequency } =
@@ -831,23 +878,30 @@ export function createApp(): express.Application {
       store.orders.unshift(newOrder);
       saveStore();
 
-      await sendBrevoTransactionalEmail(
+      // Dispatch order confirmation to customer via Zoho SMTP
+      sendTransactionalEmail(
         {
           toEmail: user.email,
           toName: user.name,
-          subject: `PureRoute Order Confirmation — ${newOrder.orderNumber}`,
-          htmlContent: `
-            <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e4cca2; border-radius: 8px;">
-              <h2 style="color: #0b2a3c; margin-top: 0;">Order Confirmed: ${newOrder.orderNumber}</h2>
-              <p>Thank you for ordering farm-direct dairy! Your morning batch is being prepared at the Madhapur Hub.</p>
-              <p><strong>Total:</strong> ₹${newOrder.totalInr} (${newOrder.paymentMethod})</p>
-              <p><strong>Slot:</strong> ${newOrder.deliverySlot}</p>
-              <p><strong>Delivery Address:</strong> ${newOrder.deliveryAddress}, TG ${newOrder.pinCode}</p>
-            </div>
-          `,
+          subject: `PureRoute Order #${newOrder.orderNumber} Confirmed (Doorstep OTP: ${newOrder.deliveryOtp})`,
+          htmlContent: templateOrderPlacedCustomer(newOrder),
         },
         recordEmail
-      );
+      ).catch((e) => console.warn('Customer order email error:', e));
+
+      // Dispatch real-time reservation alert to active Farm Partners / Merchants
+      const merchants = store.users.filter((u) => u.role === 'merchant');
+      for (const m of merchants) {
+        sendTransactionalEmail(
+          {
+            toEmail: m.email,
+            toName: m.name,
+            subject: `[PureRoute Farm Alert] New Milk Order #${newOrder.orderNumber} Reserved`,
+            htmlContent: templateMerchantOrderAlert(newOrder, m.name),
+          },
+          recordEmail
+        ).catch((e) => console.warn('Merchant order alert error:', e));
+      }
 
       res.status(201).json(newOrder);
     } catch (err: any) {
@@ -1029,22 +1083,12 @@ export function createApp(): express.Application {
     order.updatedAt = now;
     saveStore();
 
-    await sendBrevoTransactionalEmail(
+    await sendTransactionalEmail(
       {
         toEmail: order.customerEmail,
         toName: order.customerName,
         subject: `Out for Delivery! OTP: ${otp} — ${order.orderNumber}`,
-        htmlContent: `
-          <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e4cca2; border-radius: 8px;">
-            <h2 style="color: #0b2a3c;">Your Dairy is Out for Delivery!</h2>
-            <p>Hi ${order.customerName}, Courier <strong>${agent.name}</strong> is on the way.</p>
-            <div style="margin: 20px 0; padding: 14px 20px; background-color: #f8fafc; border-left: 4px solid #d8b06c;">
-              <p style="margin: 0; font-size: 13px; color: #64748b; text-transform: uppercase;">Delivery OTP</p>
-              <p style="margin: 6px 0 0; font-size: 32px; font-weight: bold; letter-spacing: 6px; color: #081119;">${otp}</p>
-            </div>
-            <p style="font-size: 13px; color: #475569;">Please share this 6-digit code with your courier upon delivery.</p>
-          </div>
-        `,
+        htmlContent: templateOrderDispatched(order, agent.name, agent.phone),
       },
       recordEmail
     );
@@ -1115,6 +1159,17 @@ export function createApp(): express.Application {
     agent.completedDeliveries += 1;
     agent.updatedAt = now;
     saveStore();
+
+    // Dispatch delivery completion notification with Zoho SMTP
+    sendTransactionalEmail(
+      {
+        toEmail: order.customerEmail,
+        toName: order.customerName,
+        subject: `Order Delivered Successfully! #${order.orderNumber}`,
+        htmlContent: templateOrderDelivered(order),
+      },
+      recordEmail
+    ).catch((e) => console.warn('Delivery email error:', e));
 
     res.json({
       message: 'Delivery completed successfully.',
@@ -1277,12 +1332,12 @@ export function createApp(): express.Application {
     saveStore();
 
     if (assigned) {
-      await sendBrevoTransactionalEmail(
+      await sendTransactionalEmail(
         {
           toEmail: assigned.email,
           toName: assigned.name,
           subject: `New PureRoute Order Offer: ${order.orderNumber}`,
-          htmlContent: `<p>New order offer #${order.orderNumber} in Hyderabad. Please accept within 3 minutes.</p>`,
+          htmlContent: `<p>New order offer #${order.orderNumber} in Hyderabad. Please accept within ${order.offerDurationMinutes || 3} minutes.</p>`,
         },
         recordEmail
       );

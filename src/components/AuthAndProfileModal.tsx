@@ -1,4 +1,4 @@
-import React, { useRef, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
   KeyRound,
@@ -78,6 +78,17 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   const [profAddress, setProfAddress] = useState(currentUser?.address || '');
   const [profPinCode, setProfPinCode] = useState(currentUser?.pinCode || '500081');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
+
+  useEffect(() => {
+    if (mode === 'auth') {
+      setTab('signin');
+      setError(null);
+      setTimeout(() => {
+        emailInputRef.current?.focus();
+      }, 120);
+    }
+  }, [mode]);
 
   const handleGenderChange = (g: GenderOption, target: 'register' | 'profile') => {
     const presets = getPresetsByGender(g);
@@ -261,9 +272,9 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
     <div
       role="dialog"
       aria-modal="true"
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-md p-4 overflow-y-auto animate-in fade-in duration-300"
     >
-      <div className="glass-panel w-full max-w-xl rounded-md p-7 md:p-8 text-[#f3efe8] shadow-2xl my-auto">
+      <div className="glass-panel w-full max-w-xl rounded-md p-7 md:p-8 text-[#f3efe8] shadow-2xl my-auto transition-transform duration-300 transform translate-y-0 animate-in slide-in-from-top-6">
         <div className="flex items-start justify-between gap-4 pb-5 border-b border-[#e4cca2]/16">
           <div>
             <p className="text-[10px] uppercase tracking-[0.22em] text-[#d8b06c]">
@@ -581,6 +592,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                       Email Address
                     </label>
                     <input
+                      ref={emailInputRef}
                       type="email"
                       required
                       value={loginEmail}
