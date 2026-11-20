@@ -2,7 +2,6 @@ import React, { useCallback, useEffect, useState } from 'react';
 import { ArrowRight, LogOut, UserCog } from 'lucide-react';
 import { api, getAuthToken, setAuthToken } from './lib/api';
 import { resolveAvatarSrc } from './lib/avatars';
-import { signOutFirebase } from './lib/firebase';
 import { WaterRippleHero } from './components/WaterRippleHero';
 import { StorefrontAndCustomerPortal } from './components/StorefrontAndCustomerPortal';
 import { MerchantPortal } from './components/MerchantPortal';
@@ -269,7 +268,6 @@ function PureRouteShell() {
     } catch {
       // ignore
     }
-    await signOutFirebase();
     setAuthToken(null);
     setCurrentUser(null);
     setOrders([]);

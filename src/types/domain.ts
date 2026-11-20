@@ -29,7 +29,7 @@ export interface Coordinates {
 
 export interface UserRecord {
   id: string;
-  firebaseUid?: string;
+  googleId?: string;
   email: string;
   passwordHash: string;
   name: string;

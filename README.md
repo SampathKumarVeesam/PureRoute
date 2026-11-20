@@ -17,6 +17,7 @@
 [![React](https://img.shields.io/badge/React-19.0-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://react.dev/)
 [![Tailwind CSS](https://img.shields.io/badge/Tailwind_CSS-v4.0-06B6D4?style=for-the-badge&logo=tailwindcss&logoColor=white)](https://tailwindcss.com/)
 [![Express](https://img.shields.io/badge/Express-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![MongoDB Atlas](https://img.shields.io/badge/MongoDB-Atlas_8.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
 [![WebGL2](https://img.shields.io/badge/WebGL2-Shader_Pipeline-990000?style=for-the-badge&logo=webgl&logoColor=white)](https://www.khronos.org/webgl/)
 [![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Swagger-85EA2D?style=for-the-badge&logo=openapiinitiative&logoColor=black)](http://localhost:3000/api-docs)
 [![Leaflet](https://img.shields.io/badge/Leaflet-1.9_Maps-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
@@ -101,26 +102,26 @@ flowchart TD
         AdminUI["🎛️ Operations Admin Console"]
     end
 
-    subgraph Server ["Backend Core (Express + TypeScript)"]
+    subgraph Server ["Backend Core (Express + TypeScript + Mongoose)"]
         Router["Express REST Router"]
         FIFO["⏱️ FIFO Dispatch Engine"]
         Watchdog["🐕 15s Expiry Watcher"]
-        StoreState["💾 Atomic JSON In-Memory Store"]
+        Database["🍃 Mongoose Connection Pool"]
         Swagger["📖 Swagger UI (/api-docs)"]
     end
 
     subgraph External ["External Infrastructure"]
+        Mongo["🍃 MongoDB Atlas (app_production)"]
         Brevo["✉️ Brevo SMTP API"]
-        Firebase["🔥 Firebase Auth & Rules"]
         Maps["🗺️ OpenStreetMap / Leaflet"]
     end
 
     Client -->|REST & Bearer JWT| Router
     Router --> FIFO
-    Router --> StoreState
+    Router --> Database
+    Database --> Mongo
     FIFO --> Watchdog
     Router --> Brevo
-    Client --> Firebase
     Client --> Maps
     Router --> Swagger
 ```
@@ -192,19 +193,43 @@ All dairy products are sourced from verified Deccan heritage farms, strictly cat
 
 ---
 
+## 🍃 MongoDB Atlas Architecture (`app_production`)
+
+PureRoute is backed by a native **MongoDB Atlas 8.0** cluster. All collections adhere to strict Mongoose schemas with explicit indexing, automatic timestamps, and clean JSON serialization (`_id` transformed to string `id`, `__v` stripped, `passwordHash` omitted from client returns).
+
+```
+app_production
+├── users                 # Customers, verified merchants, active agents, admin with bcrypt hashes
+├── products              # Seed dairy catalog (#101–#107) with Fat/SNF %, stock & freshness
+├── orders                # Full order lifecycle, universal 6-digit OTPs & dynamic UPI QR codes
+├── subscriptions         # Daily morning/evening recurring milk delivery schedules
+├── reviews               # Verified customer ratings & comments for products
+├── email_logs            # Brevo transactional email audit trail
+└── feedback_preferences  # Persistent modal reminder preferences per customer
+```
+
+### Initializing & Viewing in MongoDB Compass
+To initialize all schemas, build unique indexes, and seed sample data directly into your cluster:
+```bash
+npm run db:init
+```
+You can inspect the resulting database in **MongoDB Compass** by connecting to:
+`mongodb+srv://cluster0.nbcjv7c.mongodb.net/app_production`
+
+---
+
 ## 🔒 Security Spec & Threat Mitigation
 
-PureRoute implements the **Firestore Phase 0 TDD Security Model**, systematically preventing the **Dirty Dozen** adversarial attack vectors:
+PureRoute implements strict backend authorization, input boundary enforcement, and data isolation:
 
 ```
 [Threat Vector]                          [PureRoute Defense Mechanism]
-Identity Spoofing              ──►  auth.uid == userId constraint & immutable uids
-Privilege Escalation           ──►  Role creation locked to 'customer'; admin role immutable
-Shadow Field Injection         ──►  Strict whitelist enforcement on document schemas
-PII Blanket Scraping           ──►  collection.list() disabled; owner-isolated reads
-Admin Registry Tampering       ──►  Client-side writes to /admins/* explicitly denied (if false)
-Client Timestamp Forgery       ──►  Temporal validation: createdAt == request.time
-Payload Size Poisoning         ──►  Maximum string length bounded (<= 120 chars)
+Identity Spoofing              ──►  JWT Bearer tokens validated against Mongoose user models
+Privilege Escalation           ──►  Role creation locked to 'customer'; admin escalation blocked
+Shadow Field Injection         ──►  Strict Mongoose schema validation & allowlisting
+PII Blanket Scraping           ──►  Owner-isolated endpoints; agent masked product views
+Client Timestamp Forgery       ──►  Server-generated timestamps (now.toISOString())
+Payload Size Poisoning         ──►  Maximum string length bounded & validated
 Telangana Geospatial Poisoning ──►  Regex boundaries: ^\+91[6-9]\d{9}$ & ^500\d{3}$
 ```
 
@@ -273,10 +298,15 @@ The development and demonstration store comes pre-seeded with realistic Hyderaba
 
 ```
 pureroute-localmilkforyou-hyderabad/
+├── scripts/
+│   └── init-db.ts             # MongoDB Atlas schema initialization & seeding script
 ├── server/
+│   ├── database.ts            # Mongoose singleton connection manager & healthcheck
+│   ├── models/
+│   │   └── index.ts           # Mongoose schemas (users, products, orders, subscriptions, reviews, logs)
 │   ├── brevo.ts               # Brevo transactional email HTTPS dispatcher
 │   ├── openapi.ts             # Complete OpenAPI 3.0 specification dictionary
-│   └── store.ts               # In-memory persistence engine & FIFO queue helpers
+│   └── store.ts               # Unified data store syncing with MongoDB Atlas
 ├── src/
 │   ├── assets/images/         # Ultra high-res morning dew & dairy product visuals
 │   ├── components/
@@ -290,15 +320,12 @@ pureroute-localmilkforyou-hyderabad/
 │   │   └── WaterRippleHero.tsx # GLSL ES 3.00 WebGL2 ping-pong ripple simulation
 │   ├── lib/
 │   │   ├── api.ts             # Typed REST client with automatic JWT token attachment
-│   │   ├── avatars.ts         # Diverse avatar resolver supporting custom uploads
-│   │   └── firebase.ts        # Client-side Firebase Authentication & Google OIDC
+│   │   └── avatars.ts         # Diverse avatar resolver supporting custom uploads
 │   ├── types/
 │   │   └── domain.ts          # Core domain models, enums & Hyderabad constants
 │   ├── App.tsx                # View router, global navigation & role guard gates
 │   └── index.css              # Tailwind CSS v4 styling & typography rules
 ├── .env.example               # Template for environment configuration
-├── firestore.rules            # Firestore security rules enforcing Phase 0 TDD spec
-├── security_spec.md           # Formal specification for data invariants & threat model
 ├── server.ts                  # Express server, Vite middleware & REST endpoints
 └── vite.config.ts             # Vite configuration with Tailwind CSS v4 plugin
 ```
@@ -325,6 +352,10 @@ cp .env.example .env
 ```
 
 ```ini
+# MongoDB Atlas 8.0 Connection URI & Database
+MONGODB_URI="mongodb+srv://<username>:<password>@cluster0.xxxxxxx.mongodb.net/app_production?retryWrites=true&w=majority&appName=Cluster0"
+DB_NAME="app_production"
+
 # Application URL for verification links
 APP_URL="http://localhost:3000"
 

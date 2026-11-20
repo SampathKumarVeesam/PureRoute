@@ -1,6 +1,7 @@
 import fs from 'fs';
 import path from 'path';
 import bcrypt from 'bcryptjs';
+import mongoose from 'mongoose';
 import {
   HYDERABAD_HUB,
   type DairyProduct,
@@ -11,6 +12,15 @@ import {
   type PublicUser,
   type UserRecord,
 } from '../src/types/domain.ts';
+import {
+  UserModel,
+  ProductModel,
+  OrderModel,
+  SubscriptionModel,
+  ReviewModel,
+  EmailLogModel,
+  FeedbackPrefModel,
+} from './models/index.ts';
 
 export interface DatabaseState {
   users: UserRecord[];
@@ -589,6 +599,36 @@ function createInitialState(): DatabaseState {
 
 let state: DatabaseState | null = null;
 
+export async function loadStateFromMongo(): Promise<void> {
+  if (mongoose.connection.readyState !== 1) return;
+
+  try {
+    const [users, products, orders, subscriptions, reviews, emailLogs] = await Promise.all([
+      UserModel.find().lean(),
+      ProductModel.find().lean(),
+      OrderModel.find().lean(),
+      SubscriptionModel.find().lean(),
+      ReviewModel.find().lean(),
+      EmailLogModel.find().sort({ createdAt: -1 }).limit(100).lean(),
+    ]);
+
+    if (users.length > 0 && products.length > 0) {
+      if (!state) {
+        state = createInitialState();
+      }
+      state.users = users as any[];
+      state.products = products as any[];
+      state.orders = orders as any[];
+      state.subscriptions = subscriptions as any[];
+      state.reviews = reviews as any[];
+      state.emailLogs = emailLogs as any[];
+      console.log('🍃 [Store] Successfully loaded database state from MongoDB Atlas (app_production)');
+    }
+  } catch (err: any) {
+    console.warn('🍃 [Store] Note during Mongo state load:', err.message);
+  }
+}
+
 export function getStore(): DatabaseState {
   if (state) return state;
   try {
@@ -613,6 +653,33 @@ export function saveStore(): void {
   const tmpFile = `${DATA_FILE}.tmp`;
   fs.writeFileSync(tmpFile, JSON.stringify(state, null, 2), 'utf-8');
   fs.renameSync(tmpFile, DATA_FILE);
+
+  // Asynchronously synchronize with MongoDB Atlas if connected
+  if (mongoose.connection.readyState === 1) {
+    Promise.all([
+      ...state.users.map((u) => UserModel.updateOne({ id: u.id }, { $set: u }, { upsert: true })),
+      ...state.products.map((p) => ProductModel.updateOne({ id: p.id }, { $set: p }, { upsert: true })),
+      ...state.orders.map((o) => OrderModel.updateOne({ id: o.id }, { $set: o }, { upsert: true })),
+      ...state.subscriptions.map((s) => SubscriptionModel.updateOne({ id: s.id }, { $set: s }, { upsert: true })),
+      ...state.reviews.map((r) => ReviewModel.updateOne({ id: r.id }, { $set: r }, { upsert: true })),
+    ]).catch((err) => {
+      console.warn('🍃 [Store Sync] Warning during background MongoDB Atlas sync:', err.message);
+    });
+  }
+}
+
+export async function saveFeedbackPreference(userId: string, dontAskAgain: boolean): Promise<void> {
+  if (mongoose.connection.readyState === 1) {
+    try {
+      await FeedbackPrefModel.updateOne(
+        { userId },
+        { $set: { userId, dontAskAgain, updatedAt: new Date().toISOString() } },
+        { upsert: true }
+      );
+    } catch (err: any) {
+      console.warn('🍃 [Store] Failed to save feedback preference:', err.message);
+    }
+  }
 }
 
 export function sanitizeUser(u: UserRecord): PublicUser {

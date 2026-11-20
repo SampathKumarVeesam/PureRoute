@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import { Star, X } from 'lucide-react';
 import { api } from '../lib/api';
-import { syncFeedbackPreferenceToFirestore } from '../lib/firebase';
 import type { DairyProduct, OrderRecord } from '../types/domain';
 
 interface FeedbackModalProps {
@@ -56,7 +55,9 @@ export const FeedbackReminderModal: React.FC<FeedbackModalProps> = ({
       setBusy(true);
       try {
         await api.dismissFeedback(pendingOrder.id, dontAskAgain);
-        await syncFeedbackPreferenceToFirestore(dontAskAgain);
+        if (dontAskAgain) {
+          await api.saveFeedbackPreferences(true);
+        }
       } catch {
         // close cleanly
       } finally {

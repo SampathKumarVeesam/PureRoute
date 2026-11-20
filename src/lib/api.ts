@@ -34,7 +34,10 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set('Authorization', `Bearer ${authToken}`);
   }
 
-  const res = await fetch(path, { ...init, headers });
+  const baseUrl = (import.meta as any).env?.VITE_API_URL || '';
+  const url = path.startsWith('http') ? path : `${baseUrl}${path}`;
+
+  const res = await fetch(url, { ...init, headers });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
     throw new Error(data.error || `Request failed (${res.status})`);
@@ -78,10 +81,26 @@ export const api = {
       `/api/auth/verify-email?token=${encodeURIComponent(token)}`
     ),
 
-  googleLogin: (payload: { firebaseUid: string; email: string; name: string; idToken?: string }) =>
+  googleLogin: (payload: { email: string; name: string; avatarUrl?: string; googleId?: string }) =>
     request<{ token: string; user: PublicUser }>('/api/auth/google', {
       method: 'POST',
       body: JSON.stringify(payload),
+    }),
+
+  getDbHealth: () =>
+    request<{
+      status: 'connected' | 'connecting' | 'disconnected';
+      database: string;
+      host: string;
+      collections?: { name: string; count: number }[];
+      latencyMs?: number;
+      error?: string;
+    }>('/api/db/health'),
+
+  saveFeedbackPreferences: (dontAskAgain: boolean) =>
+    request<{ success: boolean }>('/api/feedback/preferences', {
+      method: 'POST',
+      body: JSON.stringify({ dontAskAgain }),
     }),
 
   logout: () => request<{ message: string }>('/api/auth/logout', { method: 'POST' }),

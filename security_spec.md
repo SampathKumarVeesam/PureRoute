@@ -1,24 +1,20 @@
-# PureRoute / LocalMilkforYou — Firestore Security Specification (Phase 0 TDD)
+# PureRoute / LocalMilkforYou — MongoDB Security Specification & Threat Model
 
-## 1. Data Invariants
-1. **Owner-Isolated PII (`/users/{userId}`)**: Only the authenticated owner (`request.auth.uid == userId`) or a verified Admin can read their user document. No blanket `isSignedIn()` reads or collection listing is allowed.
-2. **No Self-Escalation**: On create, `/users/{userId}` MUST set `role == 'customer'`. On update, `role`, `uid`, and `createdAt` are strictly immutable for non-admins.
-3. **Hyderabad Phone & PIN Integrity**: `phone` must match `^\+91[6-9][0-9]{9}$`, and optional `pinCode` must match `^500[0-9]{3}$`.
-4. **Verified Identity**: All writes require `request.auth.token.email_verified == true`.
-5. **Temporal Integrity**: `createdAt == request.time` on create; `updatedAt == request.time` on create and update.
-6. **Admin Registry Lockdown (`/admins/{adminId}`)**: Client writes are strictly denied (`if false`); reads are limited to the admin themselves.
-7. **Feedback Preferences (`/feedbackPreferences/{userId}`)**: Strictly owner-isolated with allowlisted keys and server timestamp enforcement.
+## 1. Data Invariants & Authorization Boundaries
+1. **Owner-Isolated User Data (`users` collection)**: Only the authenticated user (`req.currentUser.id == userId`) or an Operations Admin (`role == 'admin'`) can view their complete profile document.
+2. **No Role Escalation**: On registration, `role` is strictly locked to `'customer'`. Client profile update requests cannot mutate `role`, `id`, `email`, or `createdAt`.
+3. **Hyderabad Phone & PIN Integrity**: `phone` must match `^\+91[6-9][0-9]{9}$`, and `pinCode` must match `^500[0-9]{3}$`.
+4. **Verified Identity**: Agent onboarding strictly enforces Brevo 2-step email verification before activating agent status.
+5. **Strict Delivery Privacy Masking**: Delivery agents can NEVER access customer product names, descriptions, or images. Queries return `AgentMaskedOrder` with numeric product IDs and quantities only.
+6. **Universal OTP Enforced Completion**: Transitioning an order to `DELIVERED` requires exact validation of the cryptographically generated 6-digit delivery OTP.
+7. **Cash-on-Delivery Anti-Theft Lockout**: Any cash collected immediately locks the agent's account (`hasPendingCashDeposit: true`), barring them from receiving any new FIFO offers until cash is verified by an Admin at the Madhapur hub.
+8. **Feedback Preferences Isolation**: Customer preference flags (`dontAskAgain`) are persisted under `feedback_preferences` keyed strictly by user ID.
 
-## 2. The Dirty Dozen Adversarial Payloads (Must Return PERMISSION_DENIED)
-1. **Identity Spoofing**: Creating `/users/victimUid` as `attackerUid` with `uid: "victimUid"`.
-2. **Role Privilege Escalation (Create)**: Creating `/users/attackerUid` with `role: "admin"`.
-3. **Role Privilege Escalation (Update)**: Updating own `/users/attackerUid` to change `role: "admin"`.
-4. **Shadow Field Injection**: Creating `/users/attackerUid` with extra field `isVerified: true`.
-5. **PII Blanket Get**: Reading `/users/otherUserUid` as non-admin `attackerUid`.
-6. **Collection Scraping (List)**: Listing `/users` as a regular customer.
-7. **ID Poisoning**: Creating `/users/` with a 500-character invalid document ID containing slashes/spaces.
-8. **Unverified Email Spoofing**: Admin email claim with `email_verified: false`.
-9. **Client Timestamp Forgery**: Creating `/users/uid` with backdated `createdAt` instead of `request.time`.
-10. **Immutable Field Tampering**: Updating `createdAt` or `uid` on an existing `/users/uid` document.
-11. **Value Poisoning (Oversized String)**: Updating `name` with a 5000-character string exceeding `maxLength: 120`.
-12. **Admin Registry Tampering**: Creating `/admins/attackerUid` from client SDK.
+## 2. Adversarial Vectors Mitigation Matrix
+1. **Identity Spoofing**: JWT Bearer verification cryptographically binds requests to authenticated user IDs.
+2. **Role Privilege Escalation**: Registration endpoints hardcode role assignment; role mutation is ignored in profile update schemas.
+3. **Shadow Field Injection**: Mongoose schemas operate in `strict: true` mode, stripping unrecognized attributes.
+4. **PII Scraping**: Public user listings are disabled; customer orders are accessible only by the order's owner or administrative dispatch.
+5. **ID Poisoning & Path Traversal**: Request parameters and ObjectIds are sanitized; invalid formats return `400 Bad Request`.
+6. **Timestamp Forgery**: Server assigns timestamps using authoritative `new Date().toISOString()`.
+7. **Payload Size Poisoning**: Maximum string lengths are bounded and validated; JSON body parsing is restricted.

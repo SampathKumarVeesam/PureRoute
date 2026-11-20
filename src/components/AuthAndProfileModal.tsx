@@ -11,7 +11,6 @@ import {
 } from 'lucide-react';
 import { api, setAuthToken } from '../lib/api';
 import { getPresetsByGender, resolveAvatarSrc } from '../lib/avatars';
-import { signInWithGooglePopup, syncProfileToFirestore } from '../lib/firebase';
 import {
   HYDERABAD_AREAS,
   formatIndianPhone,
@@ -114,12 +113,20 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
     setNotice(null);
     setBusy(true);
     try {
-      const fbIdentity = await signInWithGooglePopup();
-      const res = await api.googleLogin(fbIdentity);
+      const email = prompt('Enter your Google Account email for MongoDB sign-in:', 'ananya@pureroute.in');
+      if (!email) {
+        setBusy(false);
+        return;
+      }
+      const res = await api.googleLogin({
+        email: email.trim(),
+        name: email.split('@')[0],
+        googleId: `google_${Date.now()}`,
+      });
       setAuthToken(res.token);
       onAuthenticated(res.user);
     } catch (err: any) {
-      setError(err?.message || 'Google Sign-In popup was cancelled or blocked.');
+      setError(err?.message || 'Google Sign-In failed.');
     } finally {
       setBusy(false);
     }
@@ -215,16 +222,8 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
         address: profAddress,
         pinCode: profPinCode,
       });
-      await syncProfileToFirestore({
-        name: updated.name,
-        phone: updated.phone,
-        gender: updated.gender,
-        avatarId: updated.avatarUrl.startsWith('preset:') ? updated.avatarUrl : 'custom:uploaded',
-        address: updated.address,
-        pinCode: updated.pinCode,
-      });
       onProfileUpdated(updated);
-      setNotice('Profile saved and persisted.');
+      setNotice('Profile saved and persisted to database.');
     } catch (err: any) {
       setError(err.message);
     } finally {

@@ -23,6 +23,7 @@ export const openApiSpec = {
     { name: 'Merchant Portal', description: 'Farm partner onboarding, dairy batch listing, preparation console' },
     { name: 'Delivery Agent Portal', description: 'Heartbeat presence, FIFO queue offers, privacy-masked orders, OTP/UPI QR/Cash settlement' },
     { name: 'Admin Console', description: 'Order processing, FIFO queue monitoring, manual reassignment, QR/Cash settlement approvals' },
+    { name: 'Database', description: 'MongoDB Atlas connectivity, collection health, and ping latency metrics' },
     { name: 'Feedback', description: 'Smart post-delivery feedback reminders and product reviews' },
   ],
   components: {
@@ -51,13 +52,12 @@ export const openApiSpec = {
       },
       GoogleOAuthRequest: {
         type: 'object',
-        required: ['firebaseUid', 'email', 'name'],
+        required: ['email', 'name'],
         properties: {
-          firebaseUid: { type: 'string' },
-          email: { type: 'string', format: 'email' },
-          name: { type: 'string' },
-          avatarUrl: { type: 'string' },
-          idToken: { type: 'string' },
+          email: { type: 'string', format: 'email', example: 'ananya@pureroute.in' },
+          name: { type: 'string', example: 'Ananya Reddy' },
+          avatarUrl: { type: 'string', example: 'preset:female-1' },
+          googleId: { type: 'string', example: 'google_oauth_12345' },
         },
       },
       RegisterRequest: {
@@ -624,6 +624,55 @@ export const openApiSpec = {
         summary: 'Snooze reminder for 1 hour or permanently disable popups with dontAskAgain=true',
         security: [{ bearerAuth: [] }],
         responses: { '200': { description: 'Reminder preference updated' } },
+      },
+    },
+    '/api/db/health': {
+      get: {
+        tags: ['Database'],
+        summary: 'Check MongoDB Atlas (app_production) connection health, collections, and latency',
+        responses: {
+          '200': {
+            description: 'Database health status',
+            content: {
+              'application/json': {
+                example: {
+                  status: 'connected',
+                  database: 'app_production',
+                  host: 'cluster0.nbcjv7c.mongodb.net',
+                  latencyMs: 38,
+                  collections: [
+                    { name: 'users', count: 7 },
+                    { name: 'products', count: 7 },
+                    { name: 'orders', count: 3 },
+                    { name: 'subscriptions', count: 1 },
+                    { name: 'reviews', count: 2 },
+                  ],
+                },
+              },
+            },
+          },
+        },
+      },
+    },
+    '/api/feedback/preferences': {
+      post: {
+        tags: ['Feedback'],
+        summary: 'Save persistent user feedback preferences to MongoDB',
+        security: [{ bearerAuth: [] }],
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                properties: {
+                  dontAskAgain: { type: 'boolean', example: true },
+                },
+              },
+            },
+          },
+        },
+        responses: { '200': { description: 'Preferences saved to MongoDB' } },
       },
     },
     '/api/feedback': {

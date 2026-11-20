@@ -17,7 +17,15 @@ import {
   type UserRecord,
   type UserRole,
 } from './src/types/domain.ts';
-import { getEligibleActiveAgents, getStore, sanitizeUser, saveStore } from './server/store.ts';
+import {
+  getEligibleActiveAgents,
+  getStore,
+  loadStateFromMongo,
+  sanitizeUser,
+  saveFeedbackPreference,
+  saveStore,
+} from './server/store.ts';
+import { connectToDatabase, getDatabaseHealth, seedDatabaseIfEmpty } from './server/database.ts';
 import { sendBrevoTransactionalEmail } from './server/brevo.ts';
 import { openApiSpec } from './server/openapi.ts';
 
@@ -476,22 +484,36 @@ async function startServer() {
     res.json({ token, user: sanitizeUser(user) });
   });
 
+  app.get(['/api/db/health', '/api/db/status'], async (_req: Request, res: Response) => {
+    const health = await getDatabaseHealth();
+    res.json(health);
+  });
+
+  app.post('/api/feedback/preferences', requireAuth(), async (req: AuthedRequest, res: Response) => {
+    const { dontAskAgain } = req.body || {};
+    const userId = req.currentUser!.id;
+    await saveFeedbackPreference(userId, Boolean(dontAskAgain));
+    res.json({ success: true, userId, dontAskAgain: Boolean(dontAskAgain) });
+  });
+
   app.post('/api/auth/google', (req: Request, res: Response) => {
-    const { firebaseUid, email, name, avatarUrl } = req.body || {};
+    const { email, name, avatarUrl, googleId } = req.body || {};
     const cleanEmail = String(email || '').trim().toLowerCase();
-    if (!firebaseUid || !cleanEmail) {
-      return res.status(400).json({ error: 'Missing Google OIDC identity fields.' });
+    if (!cleanEmail) {
+      return res.status(400).json({ error: 'Missing email address for Google sign-in.' });
     }
 
     const store = getStore();
-    let user = store.users.find((u) => u.firebaseUid === firebaseUid || u.email.toLowerCase() === cleanEmail);
+    let user = store.users.find(
+      (u) => (googleId && u.googleId === googleId) || u.email.toLowerCase() === cleanEmail
+    );
     const now = new Date().toISOString();
 
     if (!user) {
       const assignedRole: UserRole = cleanEmail === 'learnwithai951@gmail.com' ? 'admin' : 'customer';
       user = {
         id: `usr_google_${crypto.randomBytes(4).toString('hex')}`,
-        firebaseUid: String(firebaseUid),
+        googleId: googleId ? String(googleId) : undefined,
         email: cleanEmail,
         passwordHash: bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 10),
         name: String(name || cleanEmail.split('@')[0]),
@@ -516,7 +538,7 @@ async function startServer() {
       };
       store.users.push(user);
     } else {
-      user.firebaseUid = String(firebaseUid);
+      if (googleId) user.googleId = String(googleId);
       user.isLoggedIn = true;
       user.lastActiveAt = now;
       user.updatedAt = now;
@@ -1460,6 +1482,24 @@ async function startServer() {
     app.get('*', (_req, res) => {
       res.sendFile(path.join(distPath, 'index.html'));
     });
+  }
+
+  // Connect to MongoDB Atlas and sync state
+  try {
+    const conn = await connectToDatabase();
+    if (conn) {
+      const store = getStore();
+      await seedDatabaseIfEmpty({
+        users: store.users,
+        products: store.products,
+        orders: store.orders,
+        subscriptions: store.subscriptions,
+        reviews: store.reviews,
+      });
+      await loadStateFromMongo();
+    }
+  } catch (err: any) {
+    console.warn('🍃 [Server Boot] Note on database connection:', err.message);
   }
 
   app.listen(PORT, '0.0.0.0', () => {
