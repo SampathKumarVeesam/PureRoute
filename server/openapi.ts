@@ -638,7 +638,7 @@ export const openApiSpec = {
                 example: {
                   status: 'connected',
                   database: 'app_production',
-                  host: 'cluster0.3pcz0ia.mongodb.net',
+                  host: 'cluster0.nbcjv7c.mongodb.net',
                   latencyMs: 38,
                   collections: [
                     { name: 'users', count: 7 },
