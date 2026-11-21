@@ -3,6 +3,7 @@ import path from 'path';
 import dotenv from 'dotenv';
 import { createServer as createViteServer } from 'vite';
 import { createApp, ensureDbReady, startFifoExpirationWatcher } from './server/createApp.ts';
+import { verifySmtpConnection } from './server/email.ts';
 
 dotenv.config();
 
@@ -14,6 +15,11 @@ async function startServer() {
   // Ensure MongoDB Atlas is initialized
   await ensureDbReady();
   startFifoExpirationWatcher();
+
+  // Verify Zoho Mail SMTP connection for Render logs
+  verifySmtpConnection().catch((err) => {
+    console.warn('[SMTP Startup Warning]:', err.message);
+  });
 
   if (process.env.NODE_ENV !== 'production') {
     const vite = await createViteServer({

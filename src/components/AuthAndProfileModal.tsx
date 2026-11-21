@@ -21,6 +21,8 @@ import {
 
 interface AuthModalProps {
   mode: 'auth' | 'profile' | 'force-password';
+  initialTab?: 'signin' | 'register';
+  initialRole?: UserRole;
   currentUser: PublicUser | null;
   onClose: () => void;
   onAuthenticated: (user: PublicUser) => void;
@@ -39,12 +41,14 @@ const DEMO_ACCOUNTS = [
 
 export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   mode,
+  initialTab,
+  initialRole,
   currentUser,
   onClose,
   onAuthenticated,
   onProfileUpdated,
 }) => {
-  const [tab, setTab] = useState<'signin' | 'register'>('signin');
+  const [tab, setTab] = useState<'signin' | 'register'>(initialTab || 'signin');
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
@@ -52,7 +56,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
 
-  const [regRole, setRegRole] = useState<UserRole>('customer');
+  const [regRole, setRegRole] = useState<UserRole>(initialRole || 'customer');
   const [regName, setRegName] = useState('');
   const [regEmail, setRegEmail] = useState('');
   const [regPassword, setRegPassword] = useState('');
@@ -79,16 +83,26 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   const [profPinCode, setProfPinCode] = useState(currentUser?.pinCode || '500081');
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
+  const regNameInputRef = useRef<HTMLInputElement | null>(null);
+  const formSectionRef = useRef<HTMLDivElement | null>(null);
+  const roleFieldsRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (mode === 'auth') {
-      setTab('signin');
+      const activeTab = initialTab || 'signin';
+      setTab(activeTab);
+      if (initialRole) setRegRole(initialRole);
       setError(null);
       setTimeout(() => {
-        emailInputRef.current?.focus();
-      }, 120);
+        formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        if (activeTab === 'signin') {
+          emailInputRef.current?.focus();
+        } else {
+          regNameInputRef.current?.focus();
+        }
+      }, 100);
     }
-  }, [mode]);
+  }, [mode, initialTab, initialRole]);
 
   const handleGenderChange = (g: GenderOption, target: 'register' | 'profile') => {
     const presets = getPresetsByGender(g);
@@ -536,13 +550,17 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
 
         {/* AUTH MODE */}
         {mode === 'auth' && (
-          <div className="mt-5">
+          <div ref={formSectionRef} className="mt-5">
             <div className="flex items-center gap-6 border-b border-[#e4cca2]/14">
               <button
                 type="button"
                 onClick={() => {
                   setTab('signin');
                   setError(null);
+                  setTimeout(() => {
+                    formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    emailInputRef.current?.focus();
+                  }, 50);
                 }}
                 className={`pb-2.5 text-xs uppercase tracking-[0.14em] border-b-2 transition-colors cursor-pointer ${
                   tab === 'signin'
@@ -557,6 +575,10 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                 onClick={() => {
                   setTab('register');
                   setError(null);
+                  setTimeout(() => {
+                    formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                    regNameInputRef.current?.focus();
+                  }, 50);
                 }}
                 className={`pb-2.5 text-xs uppercase tracking-[0.14em] border-b-2 transition-colors cursor-pointer ${
                   tab === 'register'
@@ -664,7 +686,12 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                       <button
                         key={r.id}
                         type="button"
-                        onClick={() => setRegRole(r.id)}
+                        onClick={() => {
+                          setRegRole(r.id);
+                          setTimeout(() => {
+                            roleFieldsRef.current?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+                          }, 50);
+                        }}
                         className={`px-3 py-2.5 rounded-sm text-xs border transition-colors cursor-pointer ${
                           regRole === r.id
                             ? 'bg-[#d8b06c]/16 border-[#d8b06c] text-[#f8f5ef] font-medium'
@@ -677,11 +704,18 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                   </div>
                 </div>
 
-                {regRole === 'agent' && (
-                  <p className="text-xs text-[#e7c68b] bg-[#d8b06c]/10 border border-[#d8b06c]/30 rounded-sm px-3.5 py-2.5 leading-relaxed">
-                    2-Step Verified Onboarding: Verify your email via Brevo HTTPS API first, receive an auto-generated Temporary Password, then set a permanent password on first sign-in.
-                  </p>
-                )}
+                <div ref={roleFieldsRef}>
+                  {regRole === 'agent' && (
+                    <p className="text-xs text-[#e7c68b] bg-[#d8b06c]/10 border border-[#d8b06c]/30 rounded-sm px-3.5 py-2.5 leading-relaxed">
+                      2-Step Verified Onboarding: Verify your email via Zoho SMTP, receive an auto-generated Temporary Password, then set a permanent password on first sign-in.
+                    </p>
+                  )}
+                  {regRole === 'merchant' && (
+                    <p className="text-xs text-[#e7c68b] bg-[#d8b06c]/10 border border-[#d8b06c]/30 rounded-sm px-3.5 py-2.5 leading-relaxed">
+                      Farm Partner Portal Access: Register your Telangana dairy farm to publish certified single-origin morning harvests with Fat & SNF percentages.
+                    </p>
+                  )}
+                </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-3.5">
                   <div>
@@ -689,6 +723,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                       Full Name
                     </label>
                     <input
+                      ref={regNameInputRef}
                       type="text"
                       required
                       value={regName}

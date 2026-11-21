@@ -7,7 +7,7 @@ const SIM_SIZE = 512;
 
 interface WaterRippleHeroProps {
   currentUser: PublicUser | null;
-  onNavigate: (view: 'storefront' | 'subscriptions' | 'delivery' | 'merchant' | 'admin' | 'auth') => void;
+  onNavigate: (view: 'storefront' | 'subscriptions' | 'delivery' | 'merchant' | 'admin' | 'auth' | 'register') => void;
 }
 
 const FULLSCREEN_VERT = `#version 300 es
@@ -440,9 +440,24 @@ export const WaterRippleHero: React.FC<WaterRippleHeroProps> = ({ currentUser, o
             Admin
           </button>
         )}
-        <button type="button" onClick={() => onNavigate('auth')} className="hero-nav-link cursor-pointer">
-          {currentUser ? currentUser.name.split(' ')[0] : 'Sign In'}
-        </button>
+        {currentUser ? (
+          <button type="button" onClick={() => onNavigate('auth')} className="hero-nav-link cursor-pointer">
+            {currentUser.name.split(' ')[0]}
+          </button>
+        ) : (
+          <div className="flex items-center gap-3">
+            <button type="button" onClick={() => onNavigate('auth')} className="hero-nav-link cursor-pointer">
+              Sign In
+            </button>
+            <button
+              type="button"
+              onClick={() => onNavigate('register')}
+              className="px-3.5 py-1.5 rounded-full bg-white/10 hover:bg-white/20 border border-white/25 text-white text-xs uppercase tracking-wider font-medium cursor-pointer transition-all"
+            >
+              Register
+            </button>
+          </div>
+        )}
       </nav>
 
       {/* Bottom-Left Editorial Hero Typography (bottom: 64px; left: 56px, pointer-events: none) */}

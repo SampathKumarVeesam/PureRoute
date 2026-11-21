@@ -32,7 +32,7 @@ interface StorefrontProps {
   subscriptions: MilkSubscription[];
   reviews: ProductReview[];
   initialSection: 'products' | 'subscriptions' | 'orders';
-  onRequireAuth: () => void;
+  onRequireAuth: (tab?: 'signin' | 'register') => void;
   onRefreshData: () => Promise<void>;
   onOpenWriteReview: (productId: number, orderId?: string) => void;
 }
@@ -535,13 +535,22 @@ export const StorefrontAndCustomerPortal: React.FC<StorefrontProps> = ({
             {!currentUser ? (
               <div className="py-12 text-center space-y-4">
                 <p className="text-sm text-[#9aa4ae]">Sign in to review or modify your standing Hyderabad milk deliveries.</p>
-                <button
-                  type="button"
-                  onClick={onRequireAuth}
-                  className="px-6 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] cursor-pointer"
-                >
-                  Sign In
-                </button>
+                <div className="flex items-center justify-center gap-3">
+                  <button
+                    type="button"
+                    onClick={() => onRequireAuth('signin')}
+                    className="px-6 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] cursor-pointer"
+                  >
+                    Sign In
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onRequireAuth('register')}
+                    className="px-6 py-2.5 rounded-sm border border-[#e4cca2]/30 text-[#f8f5ef] hover:border-[#d8b06c] hover:text-[#d8b06c] transition-colors text-xs uppercase tracking-[0.12em] cursor-pointer"
+                  >
+                    Register
+                  </button>
+                </div>
               </div>
             ) : subscriptions.length === 0 ? (
               <p className="text-sm text-[#9aa4ae] py-10">No standing milk orders scheduled yet.</p>
@@ -594,13 +603,22 @@ export const StorefrontAndCustomerPortal: React.FC<StorefrontProps> = ({
               <p className="text-sm text-[#b2bcc6]">
                 Sign in to inspect your Hyderabad orders, synced 6-digit doorstep OTPs, and live cartographic delivery routes.
               </p>
-              <button
-                type="button"
-                onClick={onRequireAuth}
-                className="px-6 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] cursor-pointer"
-              >
-                Sign In to Track Orders
-              </button>
+              <div className="flex items-center justify-center gap-3">
+                <button
+                  type="button"
+                  onClick={() => onRequireAuth('signin')}
+                  className="px-6 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] cursor-pointer"
+                >
+                  Sign In to Track Orders
+                </button>
+                <button
+                  type="button"
+                  onClick={() => onRequireAuth('register')}
+                  className="px-6 py-2.5 rounded-sm border border-[#e4cca2]/30 text-[#f8f5ef] hover:border-[#d8b06c] hover:text-[#d8b06c] transition-colors text-xs uppercase tracking-[0.12em] cursor-pointer"
+                >
+                  Create Account
+                </button>
+              </div>
             </div>
           ) : orders.length === 0 ? (
             <div className="glass-panel rounded-md p-12 text-center text-sm text-[#9aa4ae]">

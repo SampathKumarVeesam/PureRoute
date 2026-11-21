@@ -29,6 +29,8 @@ import {
   sendTransactionalEmail,
   sendBrevoTransactionalEmail,
   templateWelcomeUser,
+  templateAgentVerification,
+  templateAgentTempPassword,
   templateOrderPlacedCustomer,
   templateMerchantOrderAlert,
   templateOrderDispatched,
@@ -274,11 +276,30 @@ export function createApp(): express.Application {
 
   // CORS Middleware
   app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
+    const origin = req.headers.origin;
+    const allowed = [
+      'https://purelocalmilk.netlify.app',
+      'https://pureroute.onrender.com',
+      'http://localhost:3000',
+      'http://localhost:5173',
+      'http://127.0.0.1:3000',
+      'http://127.0.0.1:5173',
+    ];
+
+    if (
+      origin &&
+      (allowed.includes(origin) || origin.endsWith('.netlify.app') || origin.endsWith('.onrender.com'))
+    ) {
+      res.setHeader('Access-Control-Allow-Origin', origin);
+      res.setHeader('Access-Control-Allow-Credentials', 'true');
+    } else {
+      res.setHeader('Access-Control-Allow-Origin', '*');
+    }
+
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, PATCH, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, Accept, Origin');
     if (req.method === 'OPTIONS') {
-      return res.sendStatus(200);
+      return res.sendStatus(204);
     }
     next();
   });
@@ -380,25 +401,13 @@ export function createApp(): express.Application {
         store.users.push(newAgent);
         saveStore();
 
-        const verifyUrl = `${process.env.APP_URL || 'http://localhost:3000'}?verifyToken=${verificationToken}`;
-        await sendBrevoTransactionalEmail(
+        const verifyUrl = `${process.env.APP_URL || 'https://purelocalmilk.netlify.app'}?verifyToken=${verificationToken}`;
+        await sendTransactionalEmail(
           {
             toEmail: cleanEmail,
             toName: newAgent.name,
             subject: 'PureRoute Hyderabad — Verify Your Agent Account',
-            htmlContent: `
-              <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e4cca2; border-radius: 8px;">
-                <h2 style="color: #0b2a3c; margin-top: 0;">Welcome to PureRoute Fleet, ${newAgent.name}!</h2>
-                <p>Your delivery agent registration for the Hyderabad Dairy Network has been received.</p>
-                <p>Please click below to verify your email. Once verified, your temporary login password will be generated.</p>
-                <div style="margin: 28px 0;">
-                  <a href="${verifyUrl}" style="background-color: #d8b06c; color: #081119; padding: 12px 24px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block;">
-                    Verify Agent Account
-                  </a>
-                </div>
-                <p style="font-size: 12px; color: #64748b;">Or paste this URL in your browser: ${verifyUrl}</p>
-              </div>
-            `,
+            htmlContent: templateAgentVerification(newAgent.name, verifyUrl),
           },
           recordEmail
         );
@@ -488,22 +497,12 @@ export function createApp(): express.Application {
     agent.updatedAt = new Date().toISOString();
     saveStore();
 
-    const now = new Date().toISOString();
-    await sendBrevoTransactionalEmail(
+    await sendTransactionalEmail(
       {
         toEmail: agent.email,
         toName: agent.name,
         subject: 'PureRoute Hyderabad — Your Temporary Login Password',
-        htmlContent: `
-          <div style="font-family: sans-serif; max-width: 580px; margin: 0 auto; padding: 24px; border: 1px solid #e4cca2; border-radius: 8px;">
-            <h2 style="color: #0b2a3c;">Email Verified Successfully!</h2>
-            <p>Hi ${agent.name}, your email has been verified. Use this temporary password for your first login:</p>
-            <div style="margin: 20px 0; padding: 14px 20px; background-color: #f1f5f9; border-left: 4px solid #d8b06c; font-family: monospace; font-size: 18px; font-weight: bold; letter-spacing: 2px;">
-              ${tempPassword}
-            </div>
-            <p style="color: #64748b; font-size: 13px;">For security, you will be required to choose a permanent password immediately upon your first sign in.</p>
-          </div>
-        `,
+        htmlContent: templateAgentTempPassword(agent.name, tempPassword),
       },
       recordEmail
     );
@@ -597,6 +596,15 @@ export function createApp(): express.Application {
         updatedAt: now,
       };
       store.users.push(user);
+      sendTransactionalEmail(
+        {
+          toEmail: cleanEmail,
+          toName: user.name,
+          subject: `Welcome to PureRoute LocalMilk Hyderabad, ${user.name}!`,
+          htmlContent: templateWelcomeUser(user.name, assignedRole, cleanEmail),
+        },
+        recordEmail
+      ).catch((e) => console.warn('Google registration welcome email error:', e));
     } else {
       if (googleId) user.googleId = String(googleId);
       user.isLoggedIn = true;
@@ -1054,7 +1062,20 @@ export function createApp(): express.Application {
         ['AWAITING_AGENT_ACCEPTANCE', 'OUT_FOR_DELIVERY', 'COD_QR_PENDING_ADMIN'].includes(o.status)
     );
 
+    const eligibleAgents = getEligibleActiveAgents([]);
+    const queueIndex = eligibleAgents.findIndex((a) => a.id === agent.id);
+    const fifoQueueRank = queueIndex >= 0 ? queueIndex + 1 : null;
+    const totalActiveQueue = eligibleAgents.length;
+
+    const agentOrders = store.orders
+      .filter((o) => o.assignedAgentId === agent.id)
+      .map(toAgentMaskedOrder);
+
     res.json({
+      agent: sanitizeUser(agent),
+      fifoQueueRank,
+      totalActiveQueue,
+      orders: agentOrders,
       activeOrder: activeOrder ? toAgentMaskedOrder(activeOrder) : null,
       hasPendingCashDeposit: agent.hasPendingCashDeposit,
       pendingCashAmount: agent.pendingCashAmount,
@@ -1093,7 +1114,7 @@ export function createApp(): express.Application {
       recordEmail
     );
 
-    res.json(toAgentMaskedOrder(order));
+    res.json({ message: 'Order offer accepted.', order: toAgentMaskedOrder(order) });
   });
 
   app.post('/api/agent/orders/:id/reject', requireAuth(['agent']), (req: AuthedRequest, res: Response) => {
@@ -1119,91 +1140,124 @@ export function createApp(): express.Application {
     res.json({ message: 'Offer rejected. Order rotated to next available courier.' });
   });
 
-  app.post('/api/agent/orders/:id/verify-otp', requireAuth(['agent']), (req: AuthedRequest, res: Response) => {
-    const { otp, paymentType } = req.body || {};
-    const store = getStore();
-    const agent = req.currentUser!;
-    const order = store.orders.find((o) => o.id === req.params.id);
-
-    if (!order) return res.status(404).json({ error: 'Order not found' });
-    if (order.assignedAgentId !== agent.id) {
-      return res.status(403).json({ error: 'Not authorized' });
-    }
-    if (order.status !== 'OUT_FOR_DELIVERY') {
-      return res.status(400).json({ error: 'Order must be OUT_FOR_DELIVERY to complete.' });
-    }
-    if (String(otp).trim() !== String(order.deliveryOtp)) {
-      return res.status(400).json({ error: 'Invalid 6-digit Delivery OTP.' });
-    }
-
-    const now = new Date().toISOString();
-    order.otpVerifiedAt = now;
-    order.deliveredAt = now;
-    order.status = 'DELIVERED';
-    order.updatedAt = now;
-
-    if (order.paymentMethod === 'COD' && paymentType === 'CASH') {
-      order.codMethodUsed = 'CASH';
-      order.paymentStatus = 'CASH_COLLECTED';
-      order.cashDepositStatus = 'PENDING_ADMIN_REQUEST';
-
-      agent.hasPendingCashDeposit = true;
-      agent.pendingCashAmount += order.totalInr;
-      agent.fifoQueueJoinedAt = null;
-    } else {
-      order.paymentStatus = 'PAID';
-      agent.walletBalance += 45;
-      agent.fifoQueueJoinedAt = now;
-    }
-
-    agent.completedDeliveries += 1;
-    agent.updatedAt = now;
-    saveStore();
-
-    // Dispatch delivery completion notification with Zoho SMTP
-    sendTransactionalEmail(
-      {
-        toEmail: order.customerEmail,
-        toName: order.customerName,
-        subject: `Order Delivered Successfully! #${order.orderNumber}`,
-        htmlContent: templateOrderDelivered(order),
-      },
-      recordEmail
-    ).catch((e) => console.warn('Delivery email error:', e));
-
-    res.json({
-      message: 'Delivery completed successfully.',
-      order: toAgentMaskedOrder(order),
-      agentStatus: {
-        hasPendingCashDeposit: agent.hasPendingCashDeposit,
-        pendingCashAmount: agent.pendingCashAmount,
-      },
-    });
-  });
-
-  app.post('/api/agent/orders/:id/generate-upi-qr', requireAuth(['agent']), async (req: AuthedRequest, res: Response) => {
+  app.patch('/api/agent/orders/:id/location', requireAuth(['agent']), (req: AuthedRequest, res: Response) => {
+    const { lat, lng } = req.body || {};
     const store = getStore();
     const order = store.orders.find((o) => o.id === req.params.id);
     if (!order) return res.status(404).json({ error: 'Order not found' });
-
-    const merchantVpa = process.env.UPI_MERCHANT_VPA || 'pureroute.hyd@icici';
-    const merchantName = encodeURIComponent(process.env.UPI_MERCHANT_NAME || 'PureRoute Dairy Hyderabad');
-    const upiPayload = `upi://pay?pa=${merchantVpa}&pn=${merchantName}&am=${order.totalInr}&cu=INR&tn=PureRoute-${order.orderNumber}`;
-
-    const qrDataUrl = await QRCode.toDataURL(upiPayload, {
-      margin: 1,
-      width: 320,
-      color: { dark: '#081119', light: '#f8f5ef' },
-    });
-
-    order.upiQrPayload = upiPayload;
-    order.upiQrDataUrl = qrDataUrl;
-    order.codMethodUsed = 'UPI_QR';
-    order.updatedAt = new Date().toISOString();
+    if (order.assignedAgentId !== req.currentUser!.id) {
+      return res.status(403).json({ error: 'Not authorized for this order.' });
+    }
+    const coords = { lat: Number(lat) || HYDERABAD_HUB.lat, lng: Number(lng) || HYDERABAD_HUB.lng };
+    order.agentLiveCoordinates = coords;
+    req.currentUser!.currentCoordinates = coords;
     saveStore();
-
-    res.json({ upiPayload, qrDataUrl });
+    res.json({ agentLiveCoordinates: coords });
   });
+
+  app.post(
+    ['/api/agent/orders/:id/complete', '/api/agent/orders/:id/verify-otp'],
+    requireAuth(['agent']),
+    (req: AuthedRequest, res: Response) => {
+      const { otp, paymentType, codMethod } = req.body || {};
+      const store = getStore();
+      const agent = req.currentUser!;
+      const order = store.orders.find((o) => o.id === req.params.id);
+
+      if (!order) return res.status(404).json({ error: 'Order not found' });
+      if (order.assignedAgentId !== agent.id) {
+        return res.status(403).json({ error: 'Not authorized' });
+      }
+      if (order.status !== 'OUT_FOR_DELIVERY') {
+        return res.status(400).json({ error: 'Order must be OUT_FOR_DELIVERY to complete.' });
+      }
+      if (String(otp).trim() !== String(order.deliveryOtp)) {
+        return res.status(400).json({ error: 'Invalid 6-digit Delivery OTP.' });
+      }
+
+      const now = new Date().toISOString();
+      order.otpVerifiedAt = now;
+      order.deliveredAt = now;
+      order.status = 'DELIVERED';
+      order.updatedAt = now;
+
+      const selectedPayment = paymentType || codMethod;
+      if (order.paymentMethod === 'COD' && selectedPayment === 'CASH') {
+        order.codMethodUsed = 'CASH';
+        order.paymentStatus = 'CASH_COLLECTED';
+        order.cashDepositStatus = 'PENDING_ADMIN_REQUEST';
+
+        agent.hasPendingCashDeposit = true;
+        agent.pendingCashAmount += order.totalInr;
+        agent.fifoQueueJoinedAt = null;
+      } else {
+        order.paymentStatus = 'PAID';
+        agent.walletBalance += 45;
+        agent.fifoQueueJoinedAt = now;
+      }
+
+      agent.completedDeliveries += 1;
+      agent.updatedAt = now;
+      saveStore();
+
+      // Dispatch delivery completion notification with Zoho SMTP
+      sendTransactionalEmail(
+        {
+          toEmail: order.customerEmail,
+          toName: order.customerName,
+          subject: `Order Delivered Successfully! #${order.orderNumber}`,
+          htmlContent: templateOrderDelivered(order),
+        },
+        recordEmail
+      ).catch((e) => console.warn('Delivery email error:', e));
+
+      res.json({
+        message: 'Delivery completed successfully.',
+        order: toAgentMaskedOrder(order),
+        agent: sanitizeUser(agent),
+        agentStatus: {
+          hasPendingCashDeposit: agent.hasPendingCashDeposit,
+          pendingCashAmount: agent.pendingCashAmount,
+        },
+      });
+    }
+  );
+
+  app.post(
+    ['/api/agent/orders/:id/upi-qr', '/api/agent/orders/:id/generate-upi-qr'],
+    requireAuth(['agent']),
+    async (req: AuthedRequest, res: Response) => {
+      const store = getStore();
+      const order = store.orders.find((o) => o.id === req.params.id);
+      if (!order) return res.status(404).json({ error: 'Order not found' });
+
+      const merchantVpa = process.env.UPI_MERCHANT_VPA || 'pureroute.hyd@icici';
+      const merchantName = encodeURIComponent(process.env.UPI_MERCHANT_NAME || 'PureRoute Dairy Hyderabad');
+      const upiPayload = `upi://pay?pa=${merchantVpa}&pn=${merchantName}&am=${order.totalInr}&cu=INR&tn=PureRoute-${order.orderNumber}`;
+
+      const qrDataUrl = await QRCode.toDataURL(upiPayload, {
+        margin: 1,
+        width: 320,
+        color: { dark: '#081119', light: '#f8f5ef' },
+      });
+
+      order.upiQrPayload = upiPayload;
+      order.upiQrDataUrl = qrDataUrl;
+      order.codMethodUsed = 'UPI_QR';
+      order.updatedAt = new Date().toISOString();
+      saveStore();
+
+      res.json({
+        message: 'UPI QR generated',
+        upiUri: upiPayload,
+        upiQrDataUrl: qrDataUrl,
+        upiPayload,
+        qrDataUrl,
+        amountInr: order.totalInr,
+        order: toAgentMaskedOrder(order),
+      });
+    }
+  );
 
   app.post('/api/agent/orders/:id/mark-qr-paid', requireAuth(['agent']), (req: AuthedRequest, res: Response) => {
     const store = getStore();
@@ -1216,6 +1270,18 @@ export function createApp(): express.Application {
     saveStore();
 
     res.json(toAgentMaskedOrder(order));
+  });
+
+  app.post('/api/agent/orders/:id/cash-deposited', requireAuth(['agent']), (req: AuthedRequest, res: Response) => {
+    const store = getStore();
+    const order = store.orders.find((o) => o.id === req.params.id);
+    if (!order) return res.status(404).json({ error: 'Order not found' });
+
+    order.cashDepositStatus = 'AGENT_DEPOSITED';
+    order.updatedAt = new Date().toISOString();
+    saveStore();
+
+    res.json({ message: 'Cash deposit recorded, awaiting admin confirmation.', order: toAgentMaskedOrder(order) });
   });
 
   app.post('/api/agent/cash-deposit-store', requireAuth(['agent']), (req: AuthedRequest, res: Response) => {
@@ -1286,28 +1352,107 @@ export function createApp(): express.Application {
     res.status(201).json(newProduct);
   });
 
-  app.patch('/api/merchant/products/:id', requireAuth(['merchant', 'admin']), (req: AuthedRequest, res: Response) => {
+  app.patch(
+    ['/api/merchant/products/:id', '/api/merchant/products/:id/stock'],
+    requireAuth(['merchant', 'admin']),
+    (req: AuthedRequest, res: Response) => {
+      const store = getStore();
+      const prod = store.products.find((p) => p.id === Number(req.params.id));
+      if (!prod) return res.status(404).json({ error: 'Product not found' });
+      if (req.currentUser!.role !== 'admin' && prod.merchantId !== req.currentUser!.id) {
+        return res.status(403).json({ error: 'Forbidden' });
+      }
+
+      const { stockQty, priceInr, harvestNote, fatPercent, snfPercent } = req.body || {};
+      if (stockQty !== undefined) prod.stockQty = Math.max(0, Number(stockQty));
+      if (priceInr !== undefined) prod.priceInr = Number(priceInr);
+      if (harvestNote) prod.harvestNote = String(harvestNote);
+      if (fatPercent !== undefined) prod.fatPercent = Number(fatPercent);
+      if (snfPercent !== undefined) prod.snfPercent = Number(snfPercent);
+
+      saveStore();
+      res.json(prod);
+    }
+  );
+
+  app.get('/api/merchant/orders', requireAuth(['merchant', 'admin']), (req: AuthedRequest, res: Response) => {
     const store = getStore();
-    const prod = store.products.find((p) => p.id === Number(req.params.id));
-    if (!prod) return res.status(404).json({ error: 'Product not found' });
-    if (req.currentUser!.role !== 'admin' && prod.merchantId !== req.currentUser!.id) {
-      return res.status(403).json({ error: 'Forbidden' });
+    if (req.currentUser!.role === 'admin') {
+      return res.json(store.orders);
     }
 
-    const { stockQty, priceInr, harvestNote, fatPercent, snfPercent } = req.body || {};
-    if (stockQty !== undefined) prod.stockQty = Math.max(0, Number(stockQty));
-    if (priceInr !== undefined) prod.priceInr = Number(priceInr);
-    if (harvestNote) prod.harvestNote = String(harvestNote);
-    if (fatPercent !== undefined) prod.fatPercent = Number(fatPercent);
-    if (snfPercent !== undefined) prod.snfPercent = Number(snfPercent);
-
-    saveStore();
-    res.json(prod);
+    const myProductIds = new Set(
+      store.products.filter((p) => p.merchantId === req.currentUser!.id).map((p) => p.id)
+    );
+    const merchantOrders = store.orders.filter((o) =>
+      o.items.some((item) => myProductIds.has(item.productId))
+    );
+    res.json(merchantOrders);
   });
 
   // ==========================================
   // ADMIN CONSOLE ROUTES
   // ==========================================
+  app.get('/api/admin/overview', requireAuth(['admin']), (_req: Request, res: Response) => {
+    const store = getStore();
+    checkAndExpireFifoOrders();
+
+    const now = Date.now();
+    const agents = store.users
+      .filter((u) => u.role === 'agent')
+      .map((agent) => {
+        const lastActiveMs = agent.lastActiveAt ? new Date(agent.lastActiveAt).getTime() : 0;
+        const presenceStatus: 'ACTIVE' | 'INACTIVE' = now - lastActiveMs <= 120_000 ? 'ACTIVE' : 'INACTIVE';
+        const eligible = getEligibleActiveAgents([]);
+        const queueIdx = eligible.findIndex((a) => a.id === agent.id);
+        const fifoQueueRank = queueIdx >= 0 ? queueIdx + 1 : null;
+        const isEligibleForDispatch = presenceStatus === 'ACTIVE' && !agent.hasPendingCashDeposit;
+
+        return {
+          ...sanitizeUser(agent),
+          presenceStatus,
+          fifoQueueRank,
+          isEligibleForDispatch,
+        };
+      });
+
+    const merchants = store.users.filter((u) => u.role === 'merchant').map(sanitizeUser);
+
+    const activeAgentsCount = agents.filter((a) => a.presenceStatus === 'ACTIVE').length;
+    const cashLockedAgentsCount = agents.filter((a) => a.hasPendingCashDeposit).length;
+    const processingCount = store.orders.filter((o) =>
+      ['PROCESSING', 'PROCESSED', 'AWAITING_AGENT_ACCEPTANCE'].includes(o.status)
+    ).length;
+    const outForDeliveryCount = store.orders.filter((o) => o.status === 'OUT_FOR_DELIVERY').length;
+    const pendingQrConfirmCount = store.orders.filter(
+      (o) => ['COD_QR_PENDING_ADMIN'].includes(o.status) || o.paymentStatus === 'QR_PAID_AWAITING_ADMIN'
+    ).length;
+
+    res.json({
+      settings: store.settings,
+      orders: store.orders,
+      agents,
+      merchants,
+      emailLogs: store.emailLogs,
+      stats: {
+        totalOrders: store.orders.length,
+        processingCount,
+        outForDeliveryCount,
+        activeAgentsCount,
+        cashLockedAgentsCount,
+        pendingQrConfirmCount,
+      },
+    });
+  });
+
+  app.patch('/api/admin/settings/fifo-minutes', requireAuth(['admin']), (req: Request, res: Response) => {
+    const { minutes } = req.body || {};
+    const store = getStore();
+    store.settings.fifoOfferMinutes = Math.min(5, Math.max(2, Number(minutes) || 3));
+    saveStore();
+    res.json({ fifoOfferMinutes: store.settings.fifoOfferMinutes });
+  });
+
   app.get('/api/admin/orders', requireAuth(['admin']), (_req: Request, res: Response) => {
     const store = getStore();
     checkAndExpireFifoOrders();
@@ -1360,32 +1505,48 @@ export function createApp(): express.Application {
     res.json({ order, assignedAgent: sanitizeUser(assigned) });
   });
 
-  app.post('/api/admin/orders/:id/confirm-qr-payment', requireAuth(['admin']), (req: Request, res: Response) => {
-    const store = getStore();
-    const order = store.orders.find((o) => o.id === req.params.id);
-    if (!order) return res.status(404).json({ error: 'Order not found' });
+  app.post(
+    ['/api/admin/orders/:id/confirm-qr', '/api/admin/orders/:id/confirm-qr-payment'],
+    requireAuth(['admin']),
+    (req: Request, res: Response) => {
+      const store = getStore();
+      const order = store.orders.find((o) => o.id === req.params.id);
+      if (!order) return res.status(404).json({ error: 'Order not found' });
 
-    const now = new Date().toISOString();
-    order.status = 'DELIVERED';
-    order.paymentStatus = 'PAID';
-    order.deliveredAt = now;
-    order.updatedAt = now;
+      const now = new Date().toISOString();
+      order.status = 'DELIVERED';
+      order.paymentStatus = 'PAID';
+      order.deliveredAt = now;
+      order.updatedAt = now;
 
-    if (order.assignedAgentId) {
-      const agent = store.users.find((u) => u.id === order.assignedAgentId);
-      if (agent) {
-        agent.walletBalance += 45;
-        agent.completedDeliveries += 1;
-        if (!agent.hasPendingCashDeposit) {
-          agent.fifoQueueJoinedAt = now;
+      if (order.assignedAgentId) {
+        const agent = store.users.find((u) => u.id === order.assignedAgentId);
+        if (agent) {
+          agent.walletBalance += 45;
+          agent.completedDeliveries += 1;
+          if (!agent.hasPendingCashDeposit) {
+            agent.fifoQueueJoinedAt = now;
+          }
+          agent.updatedAt = now;
         }
-        agent.updatedAt = now;
       }
-    }
 
-    saveStore();
-    res.json({ message: 'QR payment confirmed by Admin.', order });
-  });
+      saveStore();
+
+      // Dispatch delivery confirmation email
+      sendTransactionalEmail(
+        {
+          toEmail: order.customerEmail,
+          toName: order.customerName,
+          subject: `Order Delivered Successfully! #${order.orderNumber}`,
+          htmlContent: templateOrderDelivered(order),
+        },
+        recordEmail
+      ).catch((e) => console.warn('QR delivery confirm email error:', e));
+
+      res.json({ message: 'QR payment confirmed by Admin.', order });
+    }
+  );
 
   app.post('/api/admin/orders/:id/request-cash-deposit', requireAuth(['admin']), (req: Request, res: Response) => {
     const store = getStore();
@@ -1422,6 +1583,18 @@ export function createApp(): express.Application {
 
     saveStore();
     res.json({ message: 'Cash deposit confirmed. Courier lockout cleared.', order });
+  });
+
+  app.post('/api/admin/merchants/:id/verify', requireAuth(['admin']), (req: Request, res: Response) => {
+    const store = getStore();
+    const merchant = store.users.find((u) => u.id === req.params.id && u.role === 'merchant');
+    if (!merchant) return res.status(404).json({ error: 'Merchant not found' });
+
+    merchant.merchantVerified = true;
+    merchant.updatedAt = new Date().toISOString();
+    saveStore();
+
+    res.json({ message: 'Merchant verified successfully.', merchant: sanitizeUser(merchant) });
   });
 
   return app;

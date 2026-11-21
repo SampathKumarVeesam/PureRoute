@@ -25,6 +25,21 @@ export function getAuthToken(): string | null {
   return authToken;
 }
 
+function getBaseUrl(): string {
+  const envUrl = (import.meta as any).env?.VITE_API_URL;
+  if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) {
+    return envUrl.trim().replace(/\/+$/, '');
+  }
+  if (
+    typeof window !== 'undefined' &&
+    window.location.hostname !== 'localhost' &&
+    window.location.hostname !== '127.0.0.1'
+  ) {
+    return 'https://pureroute.onrender.com';
+  }
+  return '';
+}
+
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);
   if (!(init.body instanceof FormData) && !headers.has('Content-Type')) {
@@ -34,8 +49,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
     headers.set('Authorization', `Bearer ${authToken}`);
   }
 
-  const baseUrl = (import.meta as any).env?.VITE_API_URL || '';
-  const url = path.startsWith('http') ? path : `${baseUrl}${path}`;
+  const baseUrl = getBaseUrl();
+  const cleanPath = path.startsWith('/') ? path : `/${path}`;
+  const url = path.startsWith('http') ? path : baseUrl ? `${baseUrl}${cleanPath}` : cleanPath;
 
   const res = await fetch(url, { ...init, headers });
   const data = await res.json().catch(() => ({}));

@@ -1,4 +1,4 @@
-import nodemailer from 'nodemailer';
+import nodemailer, { type Transporter } from 'nodemailer';
 import crypto from 'crypto';
 import type { EmailDispatchLog, OrderRecord } from '../src/types/domain.ts';
 
@@ -10,6 +10,55 @@ export interface SendEmailParams {
   subject: string;
   htmlContent: string;
   meta?: Record<string, string>;
+}
+
+let cachedTransporter: Transporter | null = null;
+
+export function getTransporter(): Transporter {
+  if (cachedTransporter) return cachedTransporter;
+
+  const smtpHost = process.env.SMTP_HOST?.trim() || 'smtp.zoho.in';
+  const smtpPort = Number(process.env.SMTP_PORT) || 465;
+  const smtpUser = process.env.SMTP_USER?.trim() || 'sampathkumarveesam@zohomail.in';
+  const smtpPass = process.env.SMTP_PASS?.trim() || 'kw3T7Xz2zvSC';
+
+  cachedTransporter = nodemailer.createTransport({
+    host: smtpHost,
+    port: smtpPort,
+    secure: smtpPort === 465,
+    auth: {
+      user: smtpUser,
+      pass: smtpPass,
+    },
+    pool: true,
+    maxConnections: 3,
+    tls: {
+      rejectUnauthorized: false,
+    },
+  });
+
+  return cachedTransporter;
+}
+
+export async function verifySmtpConnection(): Promise<boolean> {
+  const smtpHost = process.env.SMTP_HOST?.trim() || 'smtp.zoho.in';
+  const smtpPort = Number(process.env.SMTP_PORT) || 465;
+  const smtpUser = process.env.SMTP_USER?.trim() || 'sampathkumarveesam@zohomail.in';
+
+  try {
+    const transporter = getTransporter();
+    await transporter.verify();
+    console.log(`✅ [Zoho SMTP] Verified server connection on ${smtpHost}:${smtpPort} as ${smtpUser}`);
+    return true;
+  } catch (err: any) {
+    console.error(`❌ [Zoho SMTP Verification Failed] Cannot connect to ${smtpHost}:${smtpPort}:`, {
+      message: err.message,
+      code: err.code,
+      response: err.response,
+      command: err.command,
+    });
+    return false;
+  }
 }
 
 export async function sendTransactionalEmail(
@@ -26,22 +75,10 @@ export async function sendTransactionalEmail(
   let provider: EmailDispatchLog['provider'] = 'BREVO_SANDBOX_OUTBOX';
   let statusCode = 200;
 
-  // 1. Try Zoho Mail / SMTP first
+  // 1. Primary: Zoho Mail SMTP over SSL (Port 465)
   if (smtpUser && smtpPass) {
     try {
-      const isSecure = smtpPort === 465;
-      const transporter = nodemailer.createTransport({
-        host: smtpHost,
-        port: smtpPort,
-        secure: isSecure,
-        auth: {
-          user: smtpUser,
-          pass: smtpPass,
-        },
-        tls: {
-          rejectUnauthorized: false,
-        },
-      });
+      const transporter = getTransporter();
 
       await transporter.sendMail({
         from: `"${senderName}" <${smtpFrom}>`,
@@ -52,11 +89,17 @@ export async function sendTransactionalEmail(
 
       provider = smtpHost.includes('zoho') ? 'ZOHO_SMTP' : 'SMTP_LIVE';
       statusCode = 200;
-      console.log(`✉️ [Email Sent] Successfully delivered to ${params.toEmail} via ${provider}`);
+      console.log(`✉️ [Zoho SMTP Success] Dispatched to ${params.toEmail} | Subject: "${params.subject}"`);
     } catch (smtpErr: any) {
-      console.warn(`[SMTP Warning] Failed sending via ${smtpHost}:`, smtpErr.message);
+      console.error(`❌ [Zoho SMTP Delivery Error] Failed sending to ${params.toEmail}:`, {
+        subject: params.subject,
+        error: smtpErr.message,
+        code: smtpErr.code,
+        response: smtpErr.response,
+        command: smtpErr.command,
+      });
 
-      // 2. Fallback to Brevo HTTPS API if configured
+      // 2. Secondary Fallback: Brevo HTTPS API if configured
       const apiKey = process.env.BREVO_API_KEY?.trim();
       if (apiKey) {
         try {
@@ -77,12 +120,12 @@ export async function sendTransactionalEmail(
           if (res.ok) {
             provider = 'BREVO_LIVE';
             statusCode = res.status;
-            console.log(`✉️ [Brevo Fallback Success] Sent to ${params.toEmail}`);
+            console.log(`✉️ [Brevo Fallback Success] Dispatched to ${params.toEmail}`);
           } else {
             console.warn(`[Brevo Fallback Warning] Response status: ${res.status}`);
           }
         } catch (brevoErr: any) {
-          console.warn('[Brevo Fallback Error]:', brevoErr.message);
+          console.error('[Brevo Fallback Error]:', brevoErr.message);
         }
       }
     }
@@ -159,6 +202,48 @@ export function templateWelcomeUser(name: string, role: string, email: string): 
             Access PureRoute Portal
           </a>
         </div>
+      </div>
+      ${BRAND_FOOTER}
+    </div>
+  `;
+}
+
+export function templateAgentVerification(name: string, verifyUrl: string): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #d8b06c; border-radius: 8px; overflow: hidden; background: #ffffff;">
+      ${BRAND_HEADER}
+      <div style="padding: 28px 24px; color: #212b36; line-height: 1.6;">
+        <h2 style="color: #0b1a26; margin-top: 0;">Welcome to PureRoute Fleet, ${name}!</h2>
+        <p>Your delivery agent registration for the Hyderabad Dairy Network has been received.</p>
+        <p>Please click below to verify your email. Once verified, your temporary login password will be generated.</p>
+        <div style="margin: 28px 0; text-align: center;">
+          <a href="${verifyUrl}" style="background-color: #d8b06c; color: #081119; padding: 12px 28px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px;">
+            Verify Agent Account
+          </a>
+        </div>
+        <p style="font-size: 12px; color: #64748b;">Or paste this URL into your browser: <br/><a href="${verifyUrl}" style="color: #0b2a3c;">${verifyUrl}</a></p>
+      </div>
+      ${BRAND_FOOTER}
+    </div>
+  `;
+}
+
+export function templateAgentTempPassword(name: string, tempPassword: string): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #d8b06c; border-radius: 8px; overflow: hidden; background: #ffffff;">
+      ${BRAND_HEADER}
+      <div style="padding: 28px 24px; color: #212b36; line-height: 1.6;">
+        <h2 style="color: #0b1a26; margin-top: 0;">Email Verified! Temporary Credentials</h2>
+        <p>Hello ${name}, your email is verified. Here is your temporary credentials password for the PureRoute Delivery Fleet Portal:</p>
+        <div style="background: #0b1a26; color: #ffffff; padding: 18px 24px; border-radius: 6px; text-align: center; margin: 20px 0;">
+          <p style="margin: 0 0 6px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.18em; color: #d8b06c;">
+            Temporary Password
+          </p>
+          <span style="font-size: 28px; font-weight: bold; letter-spacing: 0.15em; color: #ffffff; font-family: monospace;">
+            ${tempPassword}
+          </span>
+        </div>
+        <p>Upon your first sign-in, you will be prompted to set your permanent private password.</p>
       </div>
       ${BRAND_FOOTER}
     </div>

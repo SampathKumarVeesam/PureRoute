@@ -13,7 +13,7 @@ import {
 dotenv.config();
 
 const DEFAULT_MONGO_URI =
-  'mongodb+srv://sampathkumarveesam_db_user:NCSuFEfyOtljiiWU@cluster0.nbcjv7c.mongodb.net/app_production?retryWrites=true&w=majority&appName=Cluster0';
+  'mongodb+srv://sampathkumarveesam_db_user:JcmCdcGzU63XDU3h@cluster0.3pcz0ia.mongodb.net/app_production?retryWrites=true&w=majority&appName=Cluster0';
 
 export const MONGODB_URI = process.env.MONGODB_URI || DEFAULT_MONGO_URI;
 export const DB_NAME = process.env.DB_NAME || 'app_production';
@@ -67,7 +67,7 @@ export async function connectToDatabase(): Promise<typeof mongoose | null> {
 
 export async function getDatabaseHealth(): Promise<DatabaseHealth> {
   const readyState = mongoose.connection.readyState;
-  const host = mongoose.connection.host || 'cluster0.nbcjv7c.mongodb.net';
+  const host = mongoose.connection.host || 'cluster0.3pcz0ia.mongodb.net';
 
   if (readyState !== 1) {
     return {

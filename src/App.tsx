@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react';
+import React, { useCallback, useEffect, useRef, useState } from 'react';
 import { ArrowRight, ChevronDown, ChevronUp, Lock, LogOut, Sparkles, UserCog } from 'lucide-react';
 import { api, getAuthToken, setAuthToken } from './lib/api';
 import { resolveAvatarSrc } from './lib/avatars';
@@ -15,6 +15,7 @@ import type {
   OrderRecord,
   ProductReview,
   PublicUser,
+  UserRole,
 } from './types/domain';
 
 type ActiveView = 'hero' | 'storefront' | 'subscriptions' | 'orders' | 'delivery' | 'merchant' | 'admin';
@@ -65,6 +66,7 @@ interface RoleGateProps {
   defaultEmail?: string;
   defaultPassword?: string;
   onSignIn: () => void;
+  onRegister?: () => void;
   onAuthenticated?: (user: PublicUser) => void;
 }
 
@@ -78,6 +80,7 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
   defaultEmail = '',
   defaultPassword = '',
   onSignIn,
+  onRegister,
   onAuthenticated,
 }) => {
   const [isRolledDown, setIsRolledDown] = useState(false);
@@ -85,6 +88,22 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
   const [password, setPassword] = useState(defaultPassword);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  const formRef = useRef<HTMLDivElement | null>(null);
+  const emailInputRef = useRef<HTMLInputElement | null>(null);
+
+  const handleToggleRollDown = () => {
+    setIsRolledDown((prev) => {
+      const next = !prev;
+      if (next) {
+        setTimeout(() => {
+          formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          emailInputRef.current?.focus();
+        }, 80);
+      }
+      return next;
+    });
+  };
 
   const handleInlineSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -163,7 +182,7 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
           {/* Roll Down Sign In Toggle Button */}
           <button
             type="button"
-            onClick={() => setIsRolledDown((prev) => !prev)}
+            onClick={handleToggleRollDown}
             className="w-full inline-flex items-center justify-between px-5 py-3.5 rounded-sm btn-brass text-xs uppercase tracking-[0.14em] cursor-pointer transition-all"
           >
             <span>{isRolledDown ? 'Hide Sign In Form' : ctaLabel}</span>
@@ -172,6 +191,7 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
 
           {/* Rolled Down Sign In Form with Smooth CSS Transition */}
           <div
+            ref={formRef}
             className={`transition-all duration-500 ease-in-out overflow-hidden ${
               isRolledDown ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
             }`}
@@ -198,6 +218,7 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
                   )}
                 </div>
                 <input
+                  ref={emailInputRef}
                   type="email"
                   required
                   value={email}
@@ -228,13 +249,21 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
                 <span>{busy ? 'Authenticating...' : 'Sign In to Portal'}</span>
               </button>
 
-              <div className="pt-2 text-center">
+              <div className="pt-2 flex items-center justify-center gap-3 text-[11px] text-[#8e9ba6]">
                 <button
                   type="button"
                   onClick={onSignIn}
-                  className="text-[11px] text-[#8e9ba6] hover:text-[#d8b06c] transition-colors underline cursor-pointer"
+                  className="hover:text-[#d8b06c] transition-colors underline cursor-pointer"
                 >
-                  Or open modal sheet / register new account
+                  Open Sign In Sheet
+                </button>
+                <span>•</span>
+                <button
+                  type="button"
+                  onClick={onRegister || onSignIn}
+                  className="hover:text-[#d8b06c] transition-colors underline cursor-pointer"
+                >
+                  Register New Account
                 </button>
               </div>
             </form>
@@ -255,6 +284,15 @@ function PureRouteShell() {
 
   // Modals
   const [modalMode, setModalMode] = useState<'auth' | 'profile' | 'force-password' | null>(null);
+  const [authInitialTab, setAuthInitialTab] = useState<'signin' | 'register'>('signin');
+  const [authInitialRole, setAuthInitialRole] = useState<UserRole>('customer');
+
+  const openAuthModal = (tab: 'signin' | 'register' = 'signin', role: UserRole = 'customer') => {
+    setAuthInitialTab(tab);
+    setAuthInitialRole(role);
+    setModalMode('auth');
+  };
+
   const [feedbackModal, setFeedbackModal] = useState<{
     mode: 'reminder' | 'direct';
     pendingOrder: OrderRecord | null;
@@ -335,29 +373,37 @@ function PureRouteShell() {
   }, [currentUser, view]);
 
   const handleHeroNavigate = (
-    target: 'storefront' | 'subscriptions' | 'delivery' | 'merchant' | 'admin' | 'auth'
+    target: 'storefront' | 'subscriptions' | 'delivery' | 'merchant' | 'admin' | 'auth' | 'register'
   ) => {
     if (target === 'auth') {
       if (currentUser) {
         setModalMode('profile');
       } else {
-        setModalMode('auth');
+        openAuthModal('signin', 'customer');
+      }
+      return;
+    }
+    if (target === 'register') {
+      if (currentUser) {
+        setModalMode('profile');
+      } else {
+        openAuthModal('register', 'customer');
       }
       return;
     }
     if (target === 'delivery' && currentUser?.role !== 'agent') {
       setView('delivery');
-      if (!currentUser) setModalMode('auth');
+      if (!currentUser) openAuthModal('signin', 'agent');
       return;
     }
     if (target === 'merchant' && currentUser?.role !== 'merchant' && currentUser?.role !== 'admin') {
       setView('merchant');
-      if (!currentUser) setModalMode('auth');
+      if (!currentUser) openAuthModal('signin', 'merchant');
       return;
     }
     if (target === 'admin' && currentUser?.role !== 'admin') {
       setView('admin');
-      if (!currentUser) setModalMode('auth');
+      if (!currentUser) openAuthModal('signin', 'admin');
       return;
     }
     setView(target);
@@ -400,6 +446,8 @@ function PureRouteShell() {
           <AuthAndProfileModal
             mode={modalMode}
             currentUser={currentUser}
+            initialTab={authInitialTab}
+            initialRole={authInitialRole}
             onClose={() => setModalMode(null)}
             onAuthenticated={handleAuthenticated}
             onProfileUpdated={(u) => setCurrentUser(u)}
@@ -488,13 +536,22 @@ function PureRouteShell() {
                 </button>
               </>
             ) : (
-              <button
-                type="button"
-                onClick={() => setModalMode('auth')}
-                className="px-5 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] whitespace-nowrap shrink-0 cursor-pointer"
-              >
-                Sign In
-              </button>
+              <div className="flex items-center gap-2">
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('signin', 'customer')}
+                  className="px-4 py-2 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Sign In
+                </button>
+                <button
+                  type="button"
+                  onClick={() => openAuthModal('register', 'customer')}
+                  className="px-4 py-2 rounded-sm border border-[#e4cca2]/30 text-[#f8f5ef] hover:border-[#d8b06c] hover:text-[#d8b06c] transition-colors text-xs uppercase tracking-[0.12em] whitespace-nowrap shrink-0 cursor-pointer"
+                >
+                  Register
+                </button>
+              </div>
             )}
           </div>
         </div>
@@ -538,11 +595,11 @@ function PureRouteShell() {
             initialSection={
               view === 'subscriptions' ? 'subscriptions' : view === 'orders' ? 'orders' : 'products'
             }
-            onRequireAuth={() => setModalMode('auth')}
+            onRequireAuth={(tab) => openAuthModal(tab || 'signin', 'customer')}
             onRefreshData={() => refreshPublicAndUserData()}
             onOpenWriteReview={(productId, orderId) => {
               if (!currentUser) {
-                setModalMode('auth');
+                openAuthModal('signin', 'customer');
                 return;
               }
               const prod = products.find((p) => p.id === productId) || null;
@@ -588,7 +645,8 @@ function PureRouteShell() {
               ctaLabel="Sign In or Register as Delivery Agent"
               defaultEmail="ravi.agent@pureroute.in"
               defaultPassword="AgentHyd@2026"
-              onSignIn={() => setModalMode('auth')}
+              onSignIn={() => openAuthModal('signin', 'agent')}
+              onRegister={() => openAuthModal('register', 'agent')}
               onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
@@ -625,7 +683,8 @@ function PureRouteShell() {
               ctaLabel="Sign In to Farm Partner Portal"
               defaultEmail="srinivas.farm@pureroute.in"
               defaultPassword="FarmFresh@2026"
-              onSignIn={() => setModalMode('auth')}
+              onSignIn={() => openAuthModal('signin', 'merchant')}
+              onRegister={() => openAuthModal('register', 'merchant')}
               onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
@@ -659,7 +718,7 @@ function PureRouteShell() {
               ctaLabel="Sign In to Operations Command"
               defaultEmail="admin@pureroute.in"
               defaultPassword="AdminHyd@2026"
-              onSignIn={() => setModalMode('auth')}
+              onSignIn={() => openAuthModal('signin', 'admin')}
               onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
@@ -692,6 +751,8 @@ function PureRouteShell() {
         <AuthAndProfileModal
           mode={modalMode}
           currentUser={currentUser}
+          initialTab={authInitialTab}
+          initialRole={authInitialRole}
           onClose={() => setModalMode(null)}
           onAuthenticated={handleAuthenticated}
           onProfileUpdated={(u) => setCurrentUser(u)}
