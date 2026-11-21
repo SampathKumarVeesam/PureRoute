@@ -367,6 +367,19 @@ function PureRouteShell() {
       setProducts(prods);
       setReviews(revs);
 
+      // Handle direct verification link (?verifyToken=...)
+      try {
+        const urlParams = new URLSearchParams(window.location.search);
+        const verifyToken = urlParams.get('verifyToken');
+        if (verifyToken) {
+          window.history.replaceState({}, '', window.location.pathname);
+          await api.verifyAgentEmail(verifyToken);
+          openAuthModal('signin', 'agent');
+        }
+      } catch (err) {
+        console.warn('Agent verify token error:', err);
+      }
+
       if (getAuthToken()) {
         try {
           const profile = await api.getProfile();
@@ -676,7 +689,7 @@ function PureRouteShell() {
                   detail: 'Every PREPAID and COD drop requires the customer’s 6-digit OTP, with instant UPI QR or audited Madhapur cash-deposit clearance.',
                 },
               ]}
-              credentialHint="ravi.agent@pureroute.in / AgentHyd@2026 (or register via 2-Step Brevo Verification)"
+              credentialHint="ravi.agent@pureroute.in / AgentHyd@2026 (or register for your instant Temporary Password)"
               ctaLabel="Sign In or Register as Delivery Agent"
               defaultEmail="ravi.agent@pureroute.in"
               defaultPassword="AgentHyd@2026"
@@ -738,7 +751,7 @@ function PureRouteShell() {
                 {
                   num: '01.',
                   heading: 'One-Click Process & FIFO Auto-Dispatch',
-                  detail: 'Transitioning PROCESSING orders to PROCESSED notifies the customer via Brevo HTTPS API and dispatches FIFO Rank #1 immediately.',
+                  detail: 'Transitioning PROCESSING orders to PROCESSED notifies the customer via Zoho Mail SMTP and dispatches FIFO Rank #1 immediately.',
                 },
                 {
                   num: '02.',

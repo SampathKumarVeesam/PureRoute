@@ -385,13 +385,14 @@ export function createApp(): express.Application {
       const cleanPin = /^500\d{3}$/.test(String(pinCode || '')) ? String(pinCode) : '500081';
 
       if (validRole === 'agent') {
+        const tempPassword = generateTempPassword();
         const verificationToken = crypto.randomBytes(20).toString('hex');
-        const placeholderHash = bcrypt.hashSync(crypto.randomBytes(16).toString('hex'), 10);
+        const passwordHash = bcrypt.hashSync(tempPassword, 10);
 
         const newAgent: UserRecord = {
           id: `usr_agent_${crypto.randomBytes(4).toString('hex')}`,
           email: cleanEmail,
-          passwordHash: placeholderHash,
+          passwordHash,
           name: String(name).trim(),
           phone: formattedPhone,
           gender: validGender,
@@ -401,7 +402,7 @@ export function createApp(): express.Application {
           pinCode: cleanPin,
           coordinates: { lat: HYDERABAD_HUB.lat, lng: HYDERABAD_HUB.lng },
           currentCoordinates: { lat: HYDERABAD_HUB.lat, lng: HYDERABAD_HUB.lng },
-          isEmailVerified: false,
+          isEmailVerified: true,
           emailVerificationToken: verificationToken,
           mustChangePassword: true,
           isLoggedIn: false,
@@ -417,21 +418,22 @@ export function createApp(): express.Application {
         store.users.push(newAgent);
         saveStore();
 
-        const verifyUrl = `${process.env.APP_URL || 'https://purelocalmilk.netlify.app'}?verifyToken=${verificationToken}`;
+        // Dispatch temporary password immediately to agent's email via Zoho SMTP
         await sendTransactionalEmail(
           {
             toEmail: cleanEmail,
             toName: newAgent.name,
-            subject: 'PureRoute Hyderabad — Verify Your Agent Account',
-            htmlContent: templateAgentVerification(newAgent.name, verifyUrl),
+            subject: 'PureRoute Hyderabad — Your Temporary Login Password',
+            htmlContent: templateAgentTempPassword(newAgent.name, tempPassword),
           },
           recordEmail
-        );
+        ).catch((e) => console.warn('Agent temp password email error:', e));
 
         return res.status(201).json({
-          message: 'Agent registered successfully. Verification email sent.',
-          requiresEmailVerification: true,
-          verificationTokenForTesting: verificationToken,
+          message: 'Agent registered successfully. Your temporary login password has been sent to your email.',
+          requiresEmailVerification: false,
+          tempPasswordPreview: tempPassword,
+          verificationToken,
           user: sanitizeUser(newAgent),
         });
       }
@@ -500,7 +502,19 @@ export function createApp(): express.Application {
     }
 
     const store = getStore();
-    const agent = store.users.find((u) => u.emailVerificationToken === String(token));
+    let agent = store.users.find((u) => u.emailVerificationToken === String(token));
+    if (!agent && mongoose.connection.readyState === 1) {
+      try {
+        const doc = await UserModel.findOne({ emailVerificationToken: String(token) });
+        if (doc) {
+          const userObj = doc.toObject() as unknown as UserRecord;
+          store.users.push(userObj);
+          agent = userObj;
+        }
+      } catch (err: any) {
+        console.warn('MongoDB verify-email token lookup warning:', err.message);
+      }
+    }
     if (!agent) {
       return res.status(400).json({ error: 'Invalid or expired verification token' });
     }

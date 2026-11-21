@@ -207,11 +207,24 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
         farmName: regRole === 'merchant' ? regFarmName : undefined,
       });
 
-      if (res.requiresEmailVerification && res.verificationToken) {
+      if (res.tempPasswordPreview || regRole === 'agent') {
+        const tempPwd = res.tempPasswordPreview || '';
+        if (tempPwd) {
+          setTempPasswordPreview(tempPwd);
+          setLoginPassword(tempPwd);
+        }
+        setLoginEmail(regEmail);
+        setNotice(
+          res.message ||
+            'Delivery Agent registered successfully! Your temporary login password has been dispatched to your email and pre-filled below. Sign in now to set your permanent private password.'
+        );
+        setPendingVerifyToken(null);
+        setTab('signin');
+      } else if (res.requiresEmailVerification && res.verificationToken) {
         setPendingVerifyToken(res.verificationToken);
         setNotice(
           res.message ||
-            'Step 1 complete: Verification email dispatched via Brevo HTTPS API. Verify your email below to receive your Temporary Password.'
+            'Verification email dispatched via Zoho Mail. Please check your email to receive your Temporary Password.'
         );
       } else if (res.token && res.user) {
         setAuthToken(res.token);
@@ -234,7 +247,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
       setLoginEmail(res.email);
       setLoginPassword(res.tempPasswordPreview);
       setNotice(
-        'Step 2 complete: Email verified! Brevo dispatched your Temporary Password. Sign in now to set your permanent password.'
+        'Email verified! Your Temporary Password has been dispatched via Zoho Mail and pre-filled below. Sign in now to set your permanent password.'
       );
       setPendingVerifyToken(null);
       setTab('signin');
@@ -418,12 +431,12 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                 className="inline-flex items-center gap-2 px-4 py-2 rounded-sm btn-brass text-xs cursor-pointer"
               >
                 <Mail className="w-3.5 h-3.5" />
-                <span>Simulate Clicking Brevo Verification Link</span>
+                <span>Verify Agent Email Now</span>
               </button>
             )}
             {tempPasswordPreview && (
               <p className="font-mono-tabular text-xs text-[#e7c68b]">
-                Brevo Temporary Password: <strong className="text-white select-all">{tempPasswordPreview}</strong> (pre-filled)
+                Temporary Password: <strong className="text-white select-all">{tempPasswordPreview}</strong> (pre-filled)
               </p>
             )}
           </div>
@@ -434,7 +447,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
           <form onSubmit={handleChangePassword} className="mt-6 space-y-4">
             <div>
               <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
-                Temporary Password (from Zoho/Brevo Email)
+                Temporary Password (from Zoho Email)
               </label>
               <div className="relative">
                 <input
@@ -861,7 +874,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                 <div ref={roleFieldsRef}>
                   {regRole === 'agent' && (
                     <p className="text-xs text-[#e7c68b] bg-[#d8b06c]/10 border border-[#d8b06c]/30 rounded-sm px-3.5 py-2.5 leading-relaxed">
-                      2-Step Verified Onboarding: Verify your email via Zoho SMTP, receive an auto-generated Temporary Password, then set a permanent password on first sign-in.
+                      Instant Delivery Fleet Onboarding: Register your profile to receive an auto-generated Temporary Password via Zoho Mail, then sign in immediately to set your permanent private password.
                     </p>
                   )}
                   {regRole === 'merchant' && (
@@ -1067,7 +1080,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                     {busy
                       ? 'Submitting...'
                       : regRole === 'agent'
-                        ? 'Register & Send Brevo Verification Email'
+                        ? 'Register Delivery Agent & Send Password'
                         : 'Create Account'}
                   </span>
                 </button>

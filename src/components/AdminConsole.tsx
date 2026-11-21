@@ -165,7 +165,7 @@ export const AdminConsole: React.FC = () => {
             { id: 'orders', num: '01.', label: `Dispatch & Settlement (${data.orders.length})` },
             { id: 'agents', num: '02.', label: `FIFO Agent Roster (${data.agents.length})` },
             { id: 'merchants', num: '03.', label: `Farm Accreditation (${data.merchants.length})` },
-            { id: 'emails', num: '04.', label: `Brevo Mail Ledger (${data.emailLogs.length})` },
+            { id: 'emails', num: '04.', label: `Zoho Mail Ledger (${data.emailLogs.length})` },
           ] as const
         ).map((t) => (
           <button
@@ -475,14 +475,14 @@ export const AdminConsole: React.FC = () => {
       {activeTab === 'emails' && (
         <div className="glass-panel rounded-md p-6 md:p-7 space-y-5">
           <div className="flex flex-wrap items-baseline justify-between gap-2 pb-4 border-b border-[#e4cca2]/16">
-            <h2 className="font-editorial text-2xl text-[#f8f5ef]">Brevo HTTPS Dispatch Ledger</h2>
+            <h2 className="font-editorial text-2xl text-[#f8f5ef]">Zoho SMTP & Mail Dispatch Ledger</h2>
             <span className="text-xs text-[#8f9ba6] font-mono-tabular">
-              POST https://api.brevo.com/v3/smtp/email
+              smtp.zoho.in:465 (SSL/TLS)
             </span>
           </div>
           {data.emailLogs.length === 0 ? (
             <p className="text-xs text-[#9aa4ae] py-6">
-              No transactional dispatches recorded yet. Process an order, accept a delivery, or onboard a new courier to audit live Brevo payloads.
+              No transactional dispatches recorded yet. Process an order, accept a delivery, or onboard a new courier to audit live email payloads.
             </p>
           ) : (
             <div className="divide-y divide-[#e4cca2]/12">

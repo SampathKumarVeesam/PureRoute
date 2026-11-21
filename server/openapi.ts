@@ -259,13 +259,13 @@ export const openApiSpec = {
     '/api/auth/register': {
       post: {
         tags: ['Auth & Profiles'],
-        summary: 'Register Customer, Merchant, or Delivery Agent (2-step Brevo email verification for Agents)',
+        summary: 'Register Customer, Merchant, or Delivery Agent (Dispatches temporary login password via Zoho Mail for Agents)',
         requestBody: {
           required: true,
           content: { 'application/json': { schema: { $ref: '#/components/schemas/RegisterRequest' } } },
         },
         responses: {
-          '201': { description: 'User registered (Agents await email verification & temporary password)' },
+          '201': { description: 'User registered (Agents receive temporary login password via Zoho Mail)' },
           '400': { description: 'Validation error', content: { 'application/json': { schema: { $ref: '#/components/schemas/ErrorResponse' } } } },
         },
       },
@@ -273,7 +273,7 @@ export const openApiSpec = {
     '/api/auth/verify-email': {
       get: {
         tags: ['Auth & Profiles'],
-        summary: 'Verify Delivery Agent email token, generate bcrypt-hashed Temporary Password, and dispatch via Brevo',
+        summary: 'Verify Delivery Agent email token, generate bcrypt-hashed Temporary Password, and dispatch via Zoho Mail',
         parameters: [{ name: 'token', in: 'query', required: true, schema: { type: 'string' } }],
         responses: { '200': { description: 'Email verified and temporary password emailed' } },
       },
@@ -608,7 +608,7 @@ export const openApiSpec = {
     '/api/admin/orders/{id}/process': {
       post: {
         tags: ['Admin Console'],
-        summary: 'Mark PROCESSING order as PROCESSED -> sends Brevo email and immediately triggers FIFO Auto-Assignment Engine',
+        summary: 'Mark PROCESSING order as PROCESSED -> sends Zoho confirmation email and immediately triggers FIFO Auto-Assignment Engine',
         security: [{ bearerAuth: [] }],
         parameters: [{ name: 'id', in: 'path', required: true, schema: { type: 'string' } }],
         responses: { '200': { description: 'Order processed and dispatched to FIFO #1 active agent' } },

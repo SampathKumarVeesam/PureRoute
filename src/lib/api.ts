@@ -97,6 +97,7 @@ export const api = {
       message?: string;
       requiresEmailVerification?: boolean;
       verificationToken?: string;
+      tempPasswordPreview?: string;
     }>('/api/auth/register', {
       method: 'POST',
       body: JSON.stringify(payload),
