@@ -380,3 +380,67 @@ export function templateOrderDelivered(order: OrderRecord): string {
     </div>
   `;
 }
+
+export function templatePasswordResetOtp(name: string, otp: string): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #d8b06c; border-radius: 8px; overflow: hidden; background: #ffffff;">
+      ${BRAND_HEADER}
+      <div style="padding: 28px 24px; color: #212b36; line-height: 1.6;">
+        <h2 style="color: #0b1a26; margin-top: 0;">Password Reset Verification</h2>
+        <p>Hello ${name || 'PureRoute Member'},</p>
+        <p>We received a request to reset the password for your PureRoute account. Please use the 6-digit verification code below to authorize this password change:</p>
+        
+        <div style="background: #0b1a26; color: #ffffff; padding: 22px 24px; border-radius: 6px; text-align: center; margin: 24px 0; border: 1px solid #d8b06c;">
+          <p style="margin: 0 0 8px 0; font-size: 11px; text-transform: uppercase; letter-spacing: 0.22em; color: #d8b06c;">
+            Your 6-Digit Verification Code (OTP)
+          </p>
+          <span style="font-size: 34px; font-weight: bold; letter-spacing: 0.25em; color: #f8f5ef; font-family: monospace;">
+            ${otp}
+          </span>
+          <p style="margin: 8px 0 0 0; font-size: 11px; color: #a5b0ba;">
+            Valid for the next 15 minutes only
+          </p>
+        </div>
+
+        <p style="font-size: 13px; color: #475569;">
+          Enter this code on the PureRoute reset password screen along with your new password.
+        </p>
+
+        <div style="margin: 24px 0; text-align: center;">
+          <a href="https://purelocalmilk.netlify.app" style="background-color: #d8b06c; color: #081119; padding: 12px 28px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px;">
+            Open PureRoute Portal
+          </a>
+        </div>
+
+        <div style="background: #fdfaf3; border: 1px solid #ebd9b8; padding: 12px 16px; border-radius: 6px; font-size: 12px; color: #78350f;">
+          <strong>Security Notice:</strong> If you did not initiate this password reset request, please disregard this email. Your existing password remains unchanged and your account is secure.
+        </div>
+      </div>
+      ${BRAND_FOOTER}
+    </div>
+  `;
+}
+
+export function templatePasswordResetSuccess(name: string): string {
+  return `
+    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto; border: 1px solid #d8b06c; border-radius: 8px; overflow: hidden; background: #ffffff;">
+      ${BRAND_HEADER}
+      <div style="padding: 28px 24px; color: #212b36; line-height: 1.6;">
+        <h2 style="color: #10633b; margin-top: 0;">Password Reset Successful! ✅</h2>
+        <p>Hello ${name || 'PureRoute Member'},</p>
+        <p>The password for your PureRoute account has been updated successfully.</p>
+        <div style="background: #f5fbf7; border: 1px solid #a3e0be; padding: 14px 18px; border-radius: 6px; margin: 20px 0;">
+          <p style="margin: 0 0 4px 0;"><strong>Timestamp:</strong> ${new Date().toLocaleTimeString('en-IN', { timeZone: 'Asia/Kolkata', hour: '2-digit', minute: '2-digit' })} IST</p>
+          <p style="margin: 0;"><strong>Status:</strong> Password Updated & Verified</p>
+        </div>
+        <p>You can now sign in using your new credentials from any device.</p>
+        <div style="margin: 24px 0; text-align: center;">
+          <a href="https://purelocalmilk.netlify.app" style="background-color: #d8b06c; color: #081119; padding: 12px 28px; text-decoration: none; font-weight: bold; border-radius: 4px; display: inline-block; text-transform: uppercase; letter-spacing: 0.1em; font-size: 13px;">
+            Sign In to PureRoute
+          </a>
+        </div>
+      </div>
+      ${BRAND_FOOTER}
+    </div>
+  `;
+}

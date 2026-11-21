@@ -43,6 +43,8 @@ export interface IUserDocument extends Document {
   currentCoordinates?: { lat: number; lng: number };
   isEmailVerified: boolean;
   emailVerificationToken?: string | null;
+  resetPasswordOtp?: string | null;
+  resetPasswordExpires?: string | null;
   mustChangePassword: boolean;
   farmName?: string;
   merchantVerified?: boolean;
@@ -89,6 +91,8 @@ const userSchema = new Schema<IUserDocument>(
     },
     isEmailVerified: { type: Boolean, default: true },
     emailVerificationToken: { type: String, default: null },
+    resetPasswordOtp: { type: String, default: null },
+    resetPasswordExpires: { type: String, default: null },
     mustChangePassword: { type: Boolean, default: false },
     farmName: { type: String },
     merchantVerified: { type: Boolean, default: false },

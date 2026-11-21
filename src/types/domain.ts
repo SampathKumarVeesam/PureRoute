@@ -43,6 +43,8 @@ export interface UserRecord {
   // Email verification & 2-step agent onboarding
   isEmailVerified: boolean;
   emailVerificationToken?: string | null;
+  resetPasswordOtp?: string | null;
+  resetPasswordExpires?: string | null;
   mustChangePassword: boolean;
   // Merchant fields
   farmName?: string;

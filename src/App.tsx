@@ -1,5 +1,15 @@
 import React, { useCallback, useEffect, useRef, useState } from 'react';
-import { ArrowRight, ChevronDown, ChevronUp, Lock, LogOut, Sparkles, UserCog } from 'lucide-react';
+import {
+  ArrowRight,
+  ChevronDown,
+  ChevronUp,
+  Eye,
+  EyeOff,
+  Lock,
+  LogOut,
+  Sparkles,
+  UserCog,
+} from 'lucide-react';
 import { api, getAuthToken, setAuthToken } from './lib/api';
 import { resolveAvatarSrc } from './lib/avatars';
 import { WaterRippleHero } from './components/WaterRippleHero';
@@ -67,6 +77,7 @@ interface RoleGateProps {
   defaultPassword?: string;
   onSignIn: () => void;
   onRegister?: () => void;
+  onForgotPassword?: (email?: string) => void;
   onAuthenticated?: (user: PublicUser) => void;
 }
 
@@ -81,9 +92,11 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
   defaultPassword = '',
   onSignIn,
   onRegister,
+  onForgotPassword,
   onAuthenticated,
 }) => {
   const [isRolledDown, setIsRolledDown] = useState(true);
+  const [showPassword, setShowPassword] = useState(false);
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState(defaultPassword);
   const [busy, setBusy] = useState(false);
@@ -228,15 +241,34 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
               </div>
 
               <div>
-                <label className="block text-[11px] uppercase tracking-[0.12em] text-[#a5b0ba] mb-1">Password</label>
-                <input
-                  type="password"
-                  required
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full rounded-sm classic-input px-3.5 py-2.5 text-xs font-mono"
-                />
+                <div className="flex items-center justify-between mb-1">
+                  <label className="text-[11px] uppercase tracking-[0.12em] text-[#a5b0ba]">Password</label>
+                  <button
+                    type="button"
+                    onClick={() => (onForgotPassword ? onForgotPassword(email) : onSignIn())}
+                    className="text-[10px] text-[#d8b06c] hover:underline cursor-pointer"
+                  >
+                    Forgot Password?
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? 'text' : 'password'}
+                    required
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full rounded-sm classic-input pl-3.5 pr-10 py-2.5 text-xs font-mono"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                    aria-label={showPassword ? 'Hide password' : 'Show password'}
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
               </div>
 
               <button
@@ -283,10 +315,13 @@ function PureRouteShell() {
 
   // Modals
   const [modalMode, setModalMode] = useState<'auth' | 'profile' | 'force-password' | null>(null);
-  const [authInitialTab, setAuthInitialTab] = useState<'signin' | 'register'>('signin');
+  const [authInitialTab, setAuthInitialTab] = useState<'signin' | 'register' | 'forgot-password' | 'reset-password'>('signin');
   const [authInitialRole, setAuthInitialRole] = useState<UserRole>('customer');
 
-  const openAuthModal = (tab: 'signin' | 'register' = 'signin', role: UserRole = 'customer') => {
+  const openAuthModal = (
+    tab: 'signin' | 'register' | 'forgot-password' | 'reset-password' = 'signin',
+    role: UserRole = 'customer'
+  ) => {
     setAuthInitialTab(tab);
     setAuthInitialRole(role);
     setModalMode('auth');
@@ -647,6 +682,7 @@ function PureRouteShell() {
               defaultPassword="AgentHyd@2026"
               onSignIn={() => openAuthModal('signin', 'agent')}
               onRegister={() => openAuthModal('register', 'agent')}
+              onForgotPassword={() => openAuthModal('forgot-password', 'agent')}
               onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
@@ -685,6 +721,7 @@ function PureRouteShell() {
               defaultPassword="FarmFresh@2026"
               onSignIn={() => openAuthModal('signin', 'merchant')}
               onRegister={() => openAuthModal('register', 'merchant')}
+              onForgotPassword={() => openAuthModal('forgot-password', 'merchant')}
               onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}
@@ -719,6 +756,7 @@ function PureRouteShell() {
               defaultEmail="admin@pureroute.in"
               defaultPassword="AdminHyd@2026"
               onSignIn={() => openAuthModal('signin', 'admin')}
+              onForgotPassword={() => openAuthModal('forgot-password', 'admin')}
               onAuthenticated={(u) => handleAuthenticated(u)}
             />
           ))}

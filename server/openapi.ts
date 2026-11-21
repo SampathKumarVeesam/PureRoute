@@ -323,6 +323,55 @@ export const openApiSpec = {
         responses: { '200': { description: 'Password updated' } },
       },
     },
+    '/api/auth/forgot-password': {
+      post: {
+        tags: ['Auth & Profiles'],
+        summary: 'Request 6-digit password reset OTP dispatched via Zoho SMTP',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['email'],
+                properties: { email: { type: 'string', format: 'email', example: 'ananya@pureroute.in' } },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: '6-digit OTP code dispatched to user email' },
+          '404': { description: 'Account not found' },
+        },
+      },
+    },
+    '/api/auth/reset-password': {
+      post: {
+        tags: ['Auth & Profiles'],
+        summary: 'Verify 6-digit OTP and reset account password',
+        requestBody: {
+          required: true,
+          content: {
+            'application/json': {
+              schema: {
+                type: 'object',
+                required: ['email', 'otp', 'newPassword'],
+                properties: {
+                  email: { type: 'string', format: 'email', example: 'ananya@pureroute.in' },
+                  otp: { type: 'string', example: '582914' },
+                  newPassword: { type: 'string', minLength: 6, example: 'NewSecret@2026' },
+                },
+              },
+            },
+          },
+        },
+        responses: {
+          '200': { description: 'Password reset successful; returns active JWT session and profile' },
+          '400': { description: 'Invalid or expired OTP' },
+          '404': { description: 'Account not found' },
+        },
+      },
+    },
     '/api/profile': {
       get: {
         tags: ['Auth & Profiles'],

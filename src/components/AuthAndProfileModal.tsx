@@ -1,10 +1,13 @@
 import React, { useEffect, useRef, useState } from 'react';
 import {
   CheckCircle2,
+  Eye,
+  EyeOff,
   KeyRound,
   Lock,
   LogOut,
   Mail,
+  RotateCcw,
   ShieldCheck,
   Upload,
   UserCheck,
@@ -22,7 +25,7 @@ import {
 
 interface AuthModalProps {
   mode: 'auth' | 'profile' | 'force-password';
-  initialTab?: 'signin' | 'register';
+  initialTab?: 'signin' | 'register' | 'forgot-password' | 'reset-password';
   initialRole?: UserRole;
   currentUser: PublicUser | null;
   onClose: () => void;
@@ -51,13 +54,31 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   onAuthenticated,
   onProfileUpdated,
 }) => {
-  const [tab, setTab] = useState<'signin' | 'register'>(initialTab || 'signin');
+  const [tab, setTab] = useState<'signin' | 'register' | 'forgot-password' | 'reset-password'>(
+    initialTab || 'signin'
+  );
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [notice, setNotice] = useState<string | null>(null);
 
+  // Eye toggle visibility states
+  const [showLoginPassword, setShowLoginPassword] = useState(false);
+  const [showRegPassword, setShowRegPassword] = useState(false);
+  const [showForceCurrPwd, setShowForceCurrPwd] = useState(false);
+  const [showForceNewPwd, setShowForceNewPwd] = useState(false);
+  const [showResetNewPwd, setShowResetNewPwd] = useState(false);
+  const [showResetConfirmPwd, setShowResetConfirmPwd] = useState(false);
+
   const [loginEmail, setLoginEmail] = useState('');
   const [loginPassword, setLoginPassword] = useState('');
+
+  // Forgot & Reset Password state
+  const [forgotEmail, setForgotEmail] = useState('');
+  const [resetOtp, setResetOtp] = useState('');
+  const [resetNewPassword, setResetNewPassword] = useState('');
+  const [resetConfirmPassword, setResetConfirmPassword] = useState('');
+  const forgotEmailInputRef = useRef<HTMLInputElement | null>(null);
+  const resetOtpInputRef = useRef<HTMLInputElement | null>(null);
 
   const [regRole, setRegRole] = useState<UserRole>(initialRole || 'customer');
   const [regName, setRegName] = useState('');
@@ -100,8 +121,12 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
         formSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
         if (activeTab === 'signin') {
           emailInputRef.current?.focus();
-        } else {
+        } else if (activeTab === 'register') {
           regNameInputRef.current?.focus();
+        } else if (activeTab === 'forgot-password') {
+          forgotEmailInputRef.current?.focus();
+        } else if (activeTab === 'reset-password') {
+          resetOtpInputRef.current?.focus();
         }
       }, 100);
     }
@@ -235,6 +260,59 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
     }
   };
 
+  const handleForgotPasswordRequest = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!forgotEmail) return;
+    setError(null);
+    setNotice(null);
+    setBusy(true);
+    try {
+      const res = await api.forgotPassword(forgotEmail);
+      setNotice(res.message || 'Verification code sent! Please check your email.');
+      setTab('reset-password');
+      setTimeout(() => {
+        resetOtpInputRef.current?.focus();
+      }, 100);
+    } catch (err: any) {
+      setError(err.message || 'Failed to dispatch password reset OTP.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleResetPasswordSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setError(null);
+    setNotice(null);
+    if (!resetOtp || resetOtp.trim().length !== 6) {
+      setError('Please enter a valid 6-digit verification code.');
+      return;
+    }
+    if (resetNewPassword.length < 6) {
+      setError('New password must be at least 6 characters long.');
+      return;
+    }
+    if (resetNewPassword !== resetConfirmPassword) {
+      setError('Passwords do not match. Please re-enter.');
+      return;
+    }
+    setBusy(true);
+    try {
+      const res = await api.resetPassword({
+        email: forgotEmail,
+        otp: resetOtp.trim(),
+        newPassword: resetNewPassword,
+      });
+      setAuthToken(res.token);
+      onAuthenticated(res.user);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Password reset failed.');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   const handleSaveProfile = async (e: React.FormEvent) => {
     e.preventDefault();
     setError(null);
@@ -304,7 +382,11 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                   ? 'Set Permanent Password'
                   : tab === 'signin'
                     ? 'Member & Portal Sign In'
-                    : 'Register New Account'}
+                    : tab === 'register'
+                      ? 'Register New Account'
+                      : tab === 'forgot-password'
+                        ? 'Reset Your Password'
+                        : 'Enter OTP & Set New Password'}
             </h2>
           </div>
           {mode !== 'force-password' && (
@@ -352,28 +434,48 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
           <form onSubmit={handleChangePassword} className="mt-6 space-y-4">
             <div>
               <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
-                Temporary Password (from Brevo Email)
+                Temporary Password (from Zoho/Brevo Email)
               </label>
-              <input
-                type="password"
-                required
-                value={currPwd}
-                onChange={(e) => setCurrPwd(e.target.value)}
-                className="w-full rounded-sm classic-input px-3.5 py-2.5 text-sm"
-              />
+              <div className="relative">
+                <input
+                  type={showForceCurrPwd ? 'text' : 'password'}
+                  required
+                  value={currPwd}
+                  onChange={(e) => setCurrPwd(e.target.value)}
+                  className="w-full rounded-sm classic-input pl-3.5 pr-10 py-2.5 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowForceCurrPwd(!showForceCurrPwd)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                  aria-label={showForceCurrPwd ? 'Hide password' : 'Show password'}
+                >
+                  {showForceCurrPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <div>
               <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
                 New Permanent Password (min 8 characters)
               </label>
-              <input
-                type="password"
-                required
-                minLength={8}
-                value={newPwd}
-                onChange={(e) => setNewPwd(e.target.value)}
-                className="w-full rounded-sm classic-input px-3.5 py-2.5 text-sm"
-              />
+              <div className="relative">
+                <input
+                  type={showForceNewPwd ? 'text' : 'password'}
+                  required
+                  minLength={8}
+                  value={newPwd}
+                  onChange={(e) => setNewPwd(e.target.value)}
+                  className="w-full rounded-sm classic-input pl-3.5 pr-10 py-2.5 text-sm"
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowForceNewPwd(!showForceNewPwd)}
+                  className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                  aria-label={showForceNewPwd ? 'Hide password' : 'Show password'}
+                >
+                  {showForceNewPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                </button>
+              </div>
             </div>
             <button
               type="submit"
@@ -608,9 +710,14 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
               >
                 Register Account
               </button>
+              {(tab === 'forgot-password' || tab === 'reset-password') && (
+                <span className="pb-2.5 text-xs uppercase tracking-[0.14em] border-b-2 border-[#d8b06c] text-[#d8b06c] font-semibold">
+                  {tab === 'forgot-password' ? 'Forgot Password' : 'Reset Password (OTP)'}
+                </span>
+              )}
             </div>
 
-            {tab === 'signin' ? (
+            {tab === 'signin' && (
               <div className="mt-6 space-y-5">
                 <button
                   type="button"
@@ -644,17 +751,42 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                     />
                   </div>
                   <div>
-                    <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
-                      Password
-                    </label>
-                    <input
-                      type="password"
-                      required
-                      value={loginPassword}
-                      onChange={(e) => setLoginPassword(e.target.value)}
-                      placeholder="Enter password"
-                      className="w-full rounded-sm classic-input px-3.5 py-2.5 text-sm"
-                    />
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba]">
+                        Password
+                      </label>
+                      <button
+                        type="button"
+                        onClick={() => {
+                          setForgotEmail(loginEmail || '');
+                          setError(null);
+                          setNotice(null);
+                          setTab('forgot-password');
+                          setTimeout(() => forgotEmailInputRef.current?.focus(), 80);
+                        }}
+                        className="text-xs text-[#d8b06c] hover:underline cursor-pointer"
+                      >
+                        Forgot Password?
+                      </button>
+                    </div>
+                    <div className="relative">
+                      <input
+                        type={showLoginPassword ? 'text' : 'password'}
+                        required
+                        value={loginPassword}
+                        onChange={(e) => setLoginPassword(e.target.value)}
+                        placeholder="Enter password"
+                        className="w-full rounded-sm classic-input pl-3.5 pr-10 py-2.5 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowLoginPassword(!showLoginPassword)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                        aria-label={showLoginPassword ? 'Hide password' : 'Show password'}
+                      >
+                        {showLoginPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
                   </div>
                   <button
                     type="submit"
@@ -689,7 +821,9 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                   </div>
                 </div>
               </div>
-            ) : (
+            )}
+
+            {tab === 'register' && (
               <form onSubmit={handleRegister} className="mt-6 space-y-4">
                 <div>
                   <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
@@ -794,15 +928,25 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                       <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1">
                         Password
                       </label>
-                      <input
-                        type="password"
-                        required
-                        minLength={6}
-                        value={regPassword}
-                        onChange={(e) => setRegPassword(e.target.value)}
-                        placeholder="Min 6 characters"
-                        className="w-full rounded-sm classic-input px-3 py-2 text-sm"
-                      />
+                      <div className="relative">
+                        <input
+                          type={showRegPassword ? 'text' : 'password'}
+                          required
+                          minLength={6}
+                          value={regPassword}
+                          onChange={(e) => setRegPassword(e.target.value)}
+                          placeholder="Min 6 characters"
+                          className="w-full rounded-sm classic-input pl-3 pr-10 py-2 text-sm"
+                        />
+                        <button
+                          type="button"
+                          onClick={() => setShowRegPassword(!showRegPassword)}
+                          className="absolute right-2 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                          aria-label={showRegPassword ? 'Hide password' : 'Show password'}
+                        >
+                          {showRegPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                        </button>
+                      </div>
                     </div>
                   ) : (
                     <div>
@@ -928,6 +1072,162 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
                   </span>
                 </button>
               </form>
+            )}
+
+            {tab === 'forgot-password' && (
+              <div className="mt-6 space-y-5">
+                <div className="p-4 rounded-sm bg-[#d8b06c]/10 border border-[#d8b06c]/30 text-xs text-[#f8f5ef] leading-relaxed">
+                  Enter your registered PureRoute email address. We will dispatch a secure 6-digit verification code (OTP) via Zoho Mail to verify your identity and let you reset your password.
+                </div>
+
+                <form onSubmit={handleForgotPasswordRequest} className="space-y-4">
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
+                      Registered Email Address
+                    </label>
+                    <input
+                      ref={forgotEmailInputRef}
+                      type="email"
+                      required
+                      value={forgotEmail}
+                      onChange={(e) => setForgotEmail(e.target.value)}
+                      placeholder="ananya@pureroute.in"
+                      className="w-full rounded-sm classic-input px-3.5 py-2.5 text-sm"
+                    />
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full flex items-center justify-center gap-2 rounded-sm btn-brass text-xs uppercase tracking-[0.14em] py-3 cursor-pointer"
+                  >
+                    <Mail className="w-4 h-4" />
+                    <span>{busy ? 'Sending 6-Digit OTP...' : 'Send Reset Verification OTP'}</span>
+                  </button>
+                </form>
+
+                <div className="pt-4 border-t border-[#e4cca2]/16 text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('signin');
+                      setError(null);
+                    }}
+                    className="text-xs text-[#a5b0ba] hover:text-[#d8b06c] transition-colors cursor-pointer"
+                  >
+                    ← Back to Sign In
+                  </button>
+                </div>
+              </div>
+            )}
+
+            {tab === 'reset-password' && (
+              <div className="mt-6 space-y-5">
+                <div className="p-4 rounded-sm bg-emerald-500/10 border border-emerald-400/30 text-xs text-emerald-200 leading-relaxed">
+                  A 6-digit verification code (OTP) was dispatched via Zoho Mail to <strong className="text-white select-all">{forgotEmail}</strong>. Please enter the OTP and set your new password.
+                </div>
+
+                <form onSubmit={handleResetPasswordSubmit} className="space-y-4">
+                  <div>
+                    <div className="flex items-center justify-between mb-1.5">
+                      <label className="text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba]">
+                        6-Digit Verification Code (OTP)
+                      </label>
+                      <button
+                        type="button"
+                        onClick={handleForgotPasswordRequest}
+                        disabled={busy}
+                        className="text-xs text-[#d8b06c] hover:underline cursor-pointer"
+                      >
+                        Resend OTP
+                      </button>
+                    </div>
+                    <input
+                      ref={resetOtpInputRef}
+                      type="text"
+                      required
+                      maxLength={6}
+                      pattern="[0-9]{6}"
+                      value={resetOtp}
+                      onChange={(e) => setResetOtp(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                      placeholder="123456"
+                      className="w-full rounded-sm classic-input px-3.5 py-2.5 text-center text-xl font-mono tracking-[0.35em]"
+                    />
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
+                      New Password (min 6 characters)
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showResetNewPwd ? 'text' : 'password'}
+                        required
+                        minLength={6}
+                        value={resetNewPassword}
+                        onChange={(e) => setResetNewPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full rounded-sm classic-input pl-3.5 pr-10 py-2.5 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowResetNewPwd(!showResetNewPwd)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                        aria-label={showResetNewPwd ? 'Hide password' : 'Show password'}
+                      >
+                        {showResetNewPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
+                      Confirm New Password
+                    </label>
+                    <div className="relative">
+                      <input
+                        type={showResetConfirmPwd ? 'text' : 'password'}
+                        required
+                        minLength={6}
+                        value={resetConfirmPassword}
+                        onChange={(e) => setResetConfirmPassword(e.target.value)}
+                        placeholder="••••••••••••"
+                        className="w-full rounded-sm classic-input pl-3.5 pr-10 py-2.5 text-sm"
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowResetConfirmPwd(!showResetConfirmPwd)}
+                        className="absolute right-2.5 top-1/2 -translate-y-1/2 text-[#9aa4ae] hover:text-[#d8b06c] p-1 cursor-pointer transition-colors"
+                        aria-label={showResetConfirmPwd ? 'Hide password' : 'Show password'}
+                      >
+                        {showResetConfirmPwd ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      </button>
+                    </div>
+                  </div>
+
+                  <button
+                    type="submit"
+                    disabled={busy}
+                    className="w-full flex items-center justify-center gap-2 rounded-sm btn-brass text-xs uppercase tracking-[0.14em] py-3 cursor-pointer"
+                  >
+                    <CheckCircle2 className="w-4 h-4" />
+                    <span>{busy ? 'Verifying & Updating...' : 'Update Password & Sign In'}</span>
+                  </button>
+                </form>
+
+                <div className="pt-4 border-t border-[#e4cca2]/16 text-center">
+                  <button
+                    type="button"
+                    onClick={() => {
+                      setTab('signin');
+                      setError(null);
+                    }}
+                    className="text-xs text-[#a5b0ba] hover:text-[#d8b06c] transition-colors cursor-pointer"
+                  >
+                    ← Cancel and Return to Sign In
+                  </button>
+                </div>
+              </div>
             )}
           </div>
         )}

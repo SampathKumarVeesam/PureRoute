@@ -37,6 +37,8 @@ import {
   templateMerchantOrderAlert,
   templateOrderDispatched,
   templateOrderDelivered,
+  templatePasswordResetOtp,
+  templatePasswordResetSuccess,
 } from './email.ts';
 import { openApiSpec } from './openapi.ts';
 
@@ -528,7 +530,7 @@ export function createApp(): express.Application {
     });
   });
 
-  app.post('/api/auth/login', (req: Request, res: Response) => {
+  app.post('/api/auth/login', async (req: Request, res: Response) => {
     const { email, password } = req.body || {};
     const cleanEmail = String(email || '').trim().toLowerCase();
 
@@ -537,7 +539,20 @@ export function createApp(): express.Application {
     }
 
     const store = getStore();
-    const user = store.users.find((u) => u.email.toLowerCase() === cleanEmail);
+    let user = store.users.find((u) => u.email.toLowerCase() === cleanEmail);
+    if (!user && mongoose.connection.readyState === 1) {
+      try {
+        const doc = await UserModel.findOne({ email: cleanEmail }).lean();
+        if (doc) {
+          const foundUser = doc as unknown as UserRecord;
+          user = foundUser;
+          store.users.push(foundUser);
+        }
+      } catch (err: any) {
+        console.warn('[Login] Mongo user lookup warning:', err.message);
+      }
+    }
+
     if (!user) {
       return res.status(401).json({ error: 'Invalid email or password' });
     }
@@ -666,6 +681,181 @@ export function createApp(): express.Application {
     saveStore();
 
     res.json({ message: 'Password updated successfully', user: sanitizeUser(user) });
+  });
+
+  // ----------------------------------------------------
+  // FORGOT PASSWORD: Send 6-digit OTP to user's email
+  // ----------------------------------------------------
+  app.post('/api/auth/forgot-password', async (req: Request, res: Response) => {
+    const { email } = req.body || {};
+    const cleanEmail = String(email || '').trim().toLowerCase();
+
+    if (!cleanEmail || !cleanEmail.includes('@')) {
+      return res.status(400).json({ error: 'Please enter a valid registered email address.' });
+    }
+
+    const store = getStore();
+    let user = store.users.find((u) => u.email.toLowerCase() === cleanEmail);
+
+    if (!user && mongoose.connection.readyState === 1) {
+      try {
+        const doc = await UserModel.findOne({ email: cleanEmail }).lean();
+        if (doc) {
+          const foundUser = doc as unknown as UserRecord;
+          user = foundUser;
+          store.users.push(foundUser);
+        }
+      } catch (err: any) {
+        console.warn('[Forgot Password] Mongo lookup warning:', err.message);
+      }
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'No account registered with this email address.' });
+    }
+
+    // Generate secure 6-digit OTP
+    const otp = Math.floor(100000 + Math.random() * 900000).toString();
+    const expiresAt = new Date(Date.now() + 15 * 60 * 1000).toISOString(); // 15 mins
+
+    user.resetPasswordOtp = otp;
+    user.resetPasswordExpires = expiresAt;
+    user.updatedAt = new Date().toISOString();
+    saveStore();
+
+    if (mongoose.connection.readyState === 1) {
+      UserModel.updateOne(
+        { id: user.id },
+        { $set: { resetPasswordOtp: otp, resetPasswordExpires: expiresAt, updatedAt: user.updatedAt } }
+      ).catch((err) => {
+        console.warn('[Forgot Password] Mongo update warning:', err.message);
+      });
+    }
+
+    // Dispatch rich verification email via Zoho SMTP
+    try {
+      await sendTransactionalEmail(
+        {
+          toEmail: user.email,
+          toName: user.name,
+          subject: `Your PureRoute Password Reset Code: ${otp}`,
+          htmlContent: templatePasswordResetOtp(user.name, otp),
+        },
+        recordEmail
+      );
+      console.log(`🔑 [Forgot Password] OTP dispatched to ${user.email}`);
+    } catch (err: any) {
+      console.error(`❌ [Forgot Password] Failed to send email to ${user.email}:`, err.message);
+      return res.status(500).json({
+        error: 'Failed to send password reset email via Zoho SMTP. Please check server logs or try again.',
+      });
+    }
+
+    res.json({
+      message: 'Password reset code has been sent to your email address.',
+      email: user.email,
+    });
+  });
+
+  // ----------------------------------------------------
+  // RESET PASSWORD: Verify 6-digit OTP & update password
+  // ----------------------------------------------------
+  app.post('/api/auth/reset-password', async (req: Request, res: Response) => {
+    const { email, otp, newPassword } = req.body || {};
+    const cleanEmail = String(email || '').trim().toLowerCase();
+    const cleanOtp = String(otp || '').trim();
+    const cleanPassword = String(newPassword || '').trim();
+
+    if (!cleanEmail || !cleanOtp || !cleanPassword) {
+      return res.status(400).json({ error: 'Email, 6-digit verification code, and new password are required.' });
+    }
+
+    if (!/^\d{6}$/.test(cleanOtp)) {
+      return res.status(400).json({ error: 'Verification code must be exactly 6 digits.' });
+    }
+
+    if (cleanPassword.length < 6) {
+      return res.status(400).json({ error: 'New password must be at least 6 characters long.' });
+    }
+
+    const store = getStore();
+    let user = store.users.find((u) => u.email.toLowerCase() === cleanEmail);
+
+    if (!user && mongoose.connection.readyState === 1) {
+      try {
+        const doc = await UserModel.findOne({ email: cleanEmail }).lean();
+        if (doc) {
+          const foundUser = doc as unknown as UserRecord;
+          user = foundUser;
+          store.users.push(foundUser);
+        }
+      } catch (err: any) {
+        console.warn('[Reset Password] Mongo lookup warning:', err.message);
+      }
+    }
+
+    if (!user) {
+      return res.status(404).json({ error: 'No account registered with this email address.' });
+    }
+
+    if (!user.resetPasswordOtp || user.resetPasswordOtp !== cleanOtp) {
+      return res.status(400).json({ error: 'Invalid verification code. Please check the OTP sent to your email.' });
+    }
+
+    if (user.resetPasswordExpires && new Date(user.resetPasswordExpires).getTime() < Date.now()) {
+      return res.status(400).json({ error: 'Verification code has expired. Please request a new OTP.' });
+    }
+
+    // Hash new password & clear reset OTP
+    const newHash = bcrypt.hashSync(cleanPassword, 10);
+    const now = new Date().toISOString();
+    user.passwordHash = newHash;
+    user.resetPasswordOtp = null;
+    user.resetPasswordExpires = null;
+    user.mustChangePassword = false;
+    user.isLoggedIn = true;
+    user.lastActiveAt = now;
+    user.updatedAt = now;
+    saveStore();
+
+    if (mongoose.connection.readyState === 1) {
+      UserModel.updateOne(
+        { id: user.id },
+        {
+          $set: {
+            passwordHash: newHash,
+            resetPasswordOtp: null,
+            resetPasswordExpires: null,
+            mustChangePassword: false,
+            isLoggedIn: true,
+            lastActiveAt: now,
+            updatedAt: now,
+          },
+        }
+      ).catch((err) => {
+        console.warn('[Reset Password] Mongo update warning:', err.message);
+      });
+    }
+
+    // Send confirmation email
+    sendTransactionalEmail(
+      {
+        toEmail: user.email,
+        toName: user.name,
+        subject: 'Your PureRoute Password Has Been Reset Successfully',
+        htmlContent: templatePasswordResetSuccess(user.name),
+      },
+      recordEmail
+    ).catch((err) => {
+      console.warn('[Reset Password] Confirmation email note:', err.message);
+    });
+
+    const token = signToken(user);
+    res.json({
+      message: 'Password reset successfully! You are now logged in.',
+      token,
+      user: sanitizeUser(user),
+    });
   });
 
   app.get('/api/profile', requireAuth(), (req: AuthedRequest, res: Response) => {
