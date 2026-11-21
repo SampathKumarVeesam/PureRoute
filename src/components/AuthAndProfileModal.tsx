@@ -3,6 +3,7 @@ import {
   CheckCircle2,
   KeyRound,
   Lock,
+  LogOut,
   Mail,
   ShieldCheck,
   Upload,
@@ -25,6 +26,7 @@ interface AuthModalProps {
   initialRole?: UserRole;
   currentUser: PublicUser | null;
   onClose: () => void;
+  onLogout?: () => void;
   onAuthenticated: (user: PublicUser) => void;
   onProfileUpdated: (user: PublicUser) => void;
 }
@@ -45,6 +47,7 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   initialRole,
   currentUser,
   onClose,
+  onLogout,
   onAuthenticated,
   onProfileUpdated,
 }) => {
@@ -528,22 +531,39 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
               </div>
             </div>
 
-            <div className="flex items-center justify-end gap-3 pt-3 border-t border-[#e4cca2]/14">
-              <button
-                type="button"
-                onClick={onClose}
-                className="px-4 py-2 text-xs text-[#9aa4ae] hover:text-white cursor-pointer"
-              >
-                Close
-              </button>
-              <button
-                type="submit"
-                disabled={busy}
-                className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] cursor-pointer"
-              >
-                <CheckCircle2 className="w-4 h-4" />
-                <span>{busy ? 'Saving...' : 'Save Profile'}</span>
-              </button>
+            <div className="flex items-center justify-between gap-3 pt-4 border-t border-[#e4cca2]/14">
+              {onLogout ? (
+                <button
+                  type="button"
+                  onClick={() => {
+                    onClose();
+                    onLogout();
+                  }}
+                  className="inline-flex items-center gap-2 px-3.5 py-2 rounded-sm border border-rose-500/40 text-rose-300 hover:bg-rose-500/15 hover:border-rose-400 transition-colors text-xs uppercase tracking-wider cursor-pointer"
+                >
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
+                </button>
+              ) : (
+                <div />
+              )}
+              <div className="flex items-center gap-3">
+                <button
+                  type="button"
+                  onClick={onClose}
+                  className="px-4 py-2 text-xs text-[#9aa4ae] hover:text-white cursor-pointer"
+                >
+                  Close
+                </button>
+                <button
+                  type="submit"
+                  disabled={busy}
+                  className="inline-flex items-center gap-2 px-5 py-2.5 rounded-sm btn-brass text-xs uppercase tracking-[0.12em] cursor-pointer"
+                >
+                  <CheckCircle2 className="w-4 h-4" />
+                  <span>{busy ? 'Saving...' : 'Save Profile'}</span>
+                </button>
+              </div>
             </div>
           </form>
         )}

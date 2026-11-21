@@ -8,6 +8,7 @@ const SIM_SIZE = 512;
 interface WaterRippleHeroProps {
   currentUser: PublicUser | null;
   onNavigate: (view: 'storefront' | 'subscriptions' | 'delivery' | 'merchant' | 'admin' | 'auth' | 'register') => void;
+  onLogout?: () => void;
 }
 
 const FULLSCREEN_VERT = `#version 300 es
@@ -180,7 +181,7 @@ function createProgram(gl: WebGL2RenderingContext, vsSrc: string, fsSrc: string)
   return prog;
 }
 
-export const WaterRippleHero: React.FC<WaterRippleHeroProps> = ({ currentUser, onNavigate }) => {
+export const WaterRippleHero: React.FC<WaterRippleHeroProps> = ({ currentUser, onNavigate, onLogout }) => {
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   useEffect(() => {
@@ -441,9 +442,24 @@ export const WaterRippleHero: React.FC<WaterRippleHeroProps> = ({ currentUser, o
           </button>
         )}
         {currentUser ? (
-          <button type="button" onClick={() => onNavigate('auth')} className="hero-nav-link cursor-pointer">
-            {currentUser.name.split(' ')[0]}
-          </button>
+          <div className="flex items-center gap-3">
+            <button
+              type="button"
+              onClick={() => onNavigate('auth')}
+              className="hero-nav-link cursor-pointer font-medium text-[#f8f5ef]"
+            >
+              {currentUser.name.split(' ')[0]}
+            </button>
+            {onLogout && (
+              <button
+                type="button"
+                onClick={onLogout}
+                className="px-3 py-1 rounded-full bg-rose-500/20 hover:bg-rose-500/35 border border-rose-400/40 text-rose-200 text-xs uppercase tracking-wider font-medium cursor-pointer transition-all"
+              >
+                Sign Out
+              </button>
+            )}
+          </div>
         ) : (
           <div className="flex items-center gap-3">
             <button type="button" onClick={() => onNavigate('auth')} className="hero-nav-link cursor-pointer">

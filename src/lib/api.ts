@@ -10,14 +10,21 @@ import type {
   UserRole,
 } from '../types/domain';
 
-let authToken: string | null = sessionStorage.getItem('pureroute_jwt');
+let authToken: string | null =
+  typeof window !== 'undefined'
+    ? sessionStorage.getItem('pureroute_jwt') || localStorage.getItem('pureroute_jwt')
+    : null;
 
 export function setAuthToken(token: string | null) {
   authToken = token;
-  if (token) {
-    sessionStorage.setItem('pureroute_jwt', token);
-  } else {
-    sessionStorage.removeItem('pureroute_jwt');
+  if (typeof window !== 'undefined') {
+    if (token) {
+      sessionStorage.setItem('pureroute_jwt', token);
+      localStorage.setItem('pureroute_jwt', token);
+    } else {
+      sessionStorage.removeItem('pureroute_jwt');
+      localStorage.removeItem('pureroute_jwt');
+    }
   }
 }
 
@@ -56,6 +63,9 @@ async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const res = await fetch(url, { ...init, headers });
   const data = await res.json().catch(() => ({}));
   if (!res.ok) {
+    if (res.status === 401) {
+      setAuthToken(null);
+    }
     throw new Error(data.error || `Request failed (${res.status})`);
   }
   return data as T;

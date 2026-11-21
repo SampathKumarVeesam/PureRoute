@@ -6,6 +6,8 @@ import multer from 'multer';
 import QRCode from 'qrcode';
 import swaggerUi from 'swagger-ui-express';
 import dotenv from 'dotenv';
+import mongoose from 'mongoose';
+import { UserModel } from './models/index.ts';
 import {
   HYDERABAD_HUB,
   formatIndianPhone,
@@ -210,7 +212,7 @@ function optionalAuth(req: AuthedRequest): UserRecord | null {
 }
 
 function requireAuth(roles?: UserRole[]) {
-  return (req: AuthedRequest, res: Response, next: NextFunction) => {
+  return async (req: AuthedRequest, res: Response, next: NextFunction) => {
     const authHeader = req.headers.authorization;
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
       return res.status(401).json({ error: 'Authentication required' });
@@ -219,7 +221,19 @@ function requireAuth(roles?: UserRole[]) {
     try {
       const payload = jwt.verify(token, JWT_SECRET) as JwtPayload;
       const store = getStore();
-      const user = store.users.find((u) => u.id === payload.userId);
+      let user = store.users.find((u) => u.id === payload.userId);
+      if (!user && mongoose.connection.readyState === 1) {
+        try {
+          const doc = await UserModel.findOne({ id: payload.userId }).lean();
+          if (doc) {
+            const foundUser = doc as unknown as UserRecord;
+            user = foundUser;
+            store.users.push(foundUser);
+          }
+        } catch {
+          // silent fallback
+        }
+      }
       if (!user) {
         return res.status(401).json({ error: 'Account not found' });
       }

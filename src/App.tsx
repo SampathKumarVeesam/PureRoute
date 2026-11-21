@@ -83,13 +83,13 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
   onRegister,
   onAuthenticated,
 }) => {
-  const [isRolledDown, setIsRolledDown] = useState(false);
+  const [isRolledDown, setIsRolledDown] = useState(true);
   const [email, setEmail] = useState(defaultEmail);
   const [password, setPassword] = useState(defaultPassword);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const formRef = useRef<HTMLDivElement | null>(null);
+  const formCardRef = useRef<HTMLDivElement | null>(null);
   const emailInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleToggleRollDown = () => {
@@ -97,9 +97,9 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
       const next = !prev;
       if (next) {
         setTimeout(() => {
-          formRef.current?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          formCardRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
           emailInputRef.current?.focus();
-        }, 80);
+        }, 100);
       }
       return next;
     });
@@ -157,7 +157,7 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
           </div>
         </div>
 
-        <div className="lg:col-span-5 glass-panel rounded-md p-8 flex flex-col justify-between gap-6">
+        <div ref={formCardRef} className="lg:col-span-5 glass-panel rounded-md p-8 flex flex-col justify-between gap-6">
           <div className="space-y-4">
             <div className="flex items-center justify-between">
               <p className="text-[11px] uppercase tracking-[0.22em] text-[#d8b06c]">Authorized Portal Access</p>
@@ -191,7 +191,6 @@ const ClassicRoleGate: React.FC<RoleGateProps> = ({
 
           {/* Rolled Down Sign In Form with Smooth CSS Transition */}
           <div
-            ref={formRef}
             className={`transition-all duration-500 ease-in-out overflow-hidden ${
               isRolledDown ? 'max-h-[600px] opacity-100' : 'max-h-0 opacity-0 pointer-events-none'
             }`}
@@ -441,7 +440,7 @@ function PureRouteShell() {
   if (view === 'hero') {
     return (
       <>
-        <WaterRippleHero currentUser={currentUser} onNavigate={handleHeroNavigate} />
+        <WaterRippleHero currentUser={currentUser} onNavigate={handleHeroNavigate} onLogout={handleLogout} />
         {modalMode && (
           <AuthAndProfileModal
             mode={modalMode}
@@ -449,6 +448,7 @@ function PureRouteShell() {
             initialTab={authInitialTab}
             initialRole={authInitialRole}
             onClose={() => setModalMode(null)}
+            onLogout={handleLogout}
             onAuthenticated={handleAuthenticated}
             onProfileUpdated={(u) => setCurrentUser(u)}
           />
@@ -529,10 +529,10 @@ function PureRouteShell() {
                 <button
                   type="button"
                   onClick={handleLogout}
-                  aria-label="Sign Out"
-                  className="p-2 rounded-sm text-[#9aa4ae] hover:text-[#f8f5ef] hover:bg-white/5 transition-colors cursor-pointer"
+                  className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-sm border border-rose-500/35 bg-rose-500/10 hover:bg-rose-500/20 text-rose-200 text-xs uppercase tracking-wider font-medium transition-colors cursor-pointer"
                 >
-                  <LogOut className="w-4 h-4" />
+                  <LogOut className="w-3.5 h-3.5" />
+                  <span>Sign Out</span>
                 </button>
               </>
             ) : (
@@ -754,6 +754,7 @@ function PureRouteShell() {
           initialTab={authInitialTab}
           initialRole={authInitialRole}
           onClose={() => setModalMode(null)}
+          onLogout={handleLogout}
           onAuthenticated={handleAuthenticated}
           onProfileUpdated={(u) => setCurrentUser(u)}
         />
