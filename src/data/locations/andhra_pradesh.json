@@ -1,0 +1,496 @@
+{
+  "state": "Andhra Pradesh",
+  "code": "AP",
+  "cities": {
+    "Vijayawada": [
+      {
+        "zone": "Central",
+        "area": "One Town / Kothapet / Chittinagar / Railway Station",
+        "pin": "520001"
+      },
+      {
+        "zone": "Central",
+        "area": "Governorpet / Buckinghampet / Besant Road",
+        "pin": "520002"
+      },
+      {
+        "zone": "Central",
+        "area": "Gandhinagar / Suryaraopet / Purnanandampet",
+        "pin": "520003"
+      },
+      {
+        "zone": "North",
+        "area": "Machavaram / Gunadala / Eluru Road",
+        "pin": "520004"
+      },
+      {
+        "zone": "East",
+        "area": "Patamata / Gurunanak Colony",
+        "pin": "520006"
+      },
+      {
+        "zone": "East",
+        "area": "Autonagar / Kanuru / Yanamalakuduru / Industrial Estate",
+        "pin": "520007"
+      },
+      {
+        "zone": "East",
+        "area": "Loyola College / Polytechnic / Bharathi Nagar",
+        "pin": "520008"
+      },
+      {
+        "zone": "Central",
+        "area": "Benz Circle / Labbipet / Moghalrajpuram / Punnamathota",
+        "pin": "520010"
+      },
+      {
+        "zone": "North",
+        "area": "Satyanarayanapuram / Mutylampadu",
+        "pin": "520011"
+      },
+      {
+        "zone": "West",
+        "area": "Bhavanipuram / Vidyadharapuram / Kamakoti Nagar",
+        "pin": "520012"
+      },
+      {
+        "zone": "South",
+        "area": "Krishnalanka / Ranigarithota",
+        "pin": "520013"
+      },
+      {
+        "zone": "North",
+        "area": "Ajit Singh Nagar / Payakapuram",
+        "pin": "520015"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Poranki / Penamaluru / Tadigadapa",
+        "pin": "521137"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Gannavaram / Airport Area",
+        "pin": "521101"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Ibrahimpatnam / Kondapalli",
+        "pin": "521456"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Tadepalli / Mangalagiri / Amaravati Capital Region",
+        "pin": "522501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Guntur (~35 km)",
+        "pin": "522001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tenali (~35 km)",
+        "pin": "522201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Gudivada (~45 km)",
+        "pin": "521301"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Eluru (~60 km)",
+        "pin": "534001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Machilipatnam (~65 km)",
+        "pin": "521001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Narasaraopet (~85 km)",
+        "pin": "522601"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bhimavaram (~110 km)",
+        "pin": "534201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ongole (~150 km)",
+        "pin": "523001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Rajahmundry (~160 km)",
+        "pin": "533101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kakinada (~215 km)",
+        "pin": "533001"
+      }
+    ],
+    "Visakhapatnam": [
+      {
+        "zone": "South",
+        "area": "Old Town / Port Area / Collectorate / Waltair",
+        "pin": "530001"
+      },
+      {
+        "zone": "Central",
+        "area": "Jagadamba Junction / Dabagardens / Suryabagh",
+        "pin": "530002"
+      },
+      {
+        "zone": "Central",
+        "area": "Asilmetta / Andhra University / Siripuram / Waltair Uplands",
+        "pin": "530003"
+      },
+      {
+        "zone": "Central",
+        "area": "Dwaraka Nagar / Allipuram / Railway New Colony",
+        "pin": "530004"
+      },
+      {
+        "zone": "West",
+        "area": "Kancharapalem / Gavara Kancharapalem",
+        "pin": "530008"
+      },
+      {
+        "zone": "West",
+        "area": "NAD Junction / Airport / Gopalapatnam",
+        "pin": "530009"
+      },
+      {
+        "zone": "South",
+        "area": "Malkapuram / Scindia / Naval Dockyard",
+        "pin": "530011"
+      },
+      {
+        "zone": "West",
+        "area": "Auto Nagar / BHPV / Sheela Nagar",
+        "pin": "530012"
+      },
+      {
+        "zone": "Central",
+        "area": "Seethammadhara / Maddilapalem / HB Colony",
+        "pin": "530013"
+      },
+      {
+        "zone": "Central",
+        "area": "Akkayyapalem / Lalitha Nagar",
+        "pin": "530016"
+      },
+      {
+        "zone": "East",
+        "area": "MVP Colony / Lawsons Bay Colony",
+        "pin": "530017"
+      },
+      {
+        "zone": "South",
+        "area": "Gajuwaka / Pedagantyada / Kurmannapalem",
+        "pin": "530026"
+      },
+      {
+        "zone": "South",
+        "area": "Ukkunagaram / Visakhapatnam Steel Plant",
+        "pin": "530032"
+      },
+      {
+        "zone": "North",
+        "area": "Arilova / Chinagadili / Hanumanthavaka",
+        "pin": "530040"
+      },
+      {
+        "zone": "North",
+        "area": "Yendada / Rushikonda / Sagar Nagar / IT SEZ",
+        "pin": "530045"
+      },
+      {
+        "zone": "South",
+        "area": "Aganampudi / Duvvada",
+        "pin": "530046"
+      },
+      {
+        "zone": "North",
+        "area": "Madhurawada / Kommadi / PM Palem",
+        "pin": "530048"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Pendurthi / Vepagunta / Sujatha Nagar",
+        "pin": "531173"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Bheemunipatnam / Tagarapuvalasa / Anandapuram",
+        "pin": "531163"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Anakapalle",
+        "pin": "531001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Vizianagaram (~60 km)",
+        "pin": "535001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Narsipatnam (~80 km)",
+        "pin": "531116"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tuni (~100 km)",
+        "pin": "533401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Srikakulam (~115 km)",
+        "pin": "532001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kakinada (~155 km)",
+        "pin": "533001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Rajahmundry (~195 km)",
+        "pin": "533101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Brahmapur / Berhampur (OD) (~280 km)",
+        "pin": "760001"
+      }
+    ],
+    "Kurnool": [
+      {
+        "zone": "Central",
+        "area": "Kurnool Bazar / Chowk / Kothapeta / One Town / District Court",
+        "pin": "518001"
+      },
+      {
+        "zone": "Central",
+        "area": "A Camp / B Camp / Aditya Nagar / Kurnool Camp",
+        "pin": "518002"
+      },
+      {
+        "zone": "East",
+        "area": "Ameen Abbas Nagar / Maddur Nagar / Bellary Chowrasta",
+        "pin": "518003"
+      },
+      {
+        "zone": "North",
+        "area": "N R Peta / C Camp / Budhawarapeta",
+        "pin": "518004"
+      },
+      {
+        "zone": "West",
+        "area": "Ashok Nagar / Gayatri Estate / Kallur",
+        "pin": "518005"
+      },
+      {
+        "zone": "South",
+        "area": "Balaji Nagar / Joharapuram / Munagalapadu",
+        "pin": "518006"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "B. Thandrapadu / GPRE College / Orvakal Airport",
+        "pin": "518007"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Vorkavallu / Panchalingala",
+        "pin": "518010"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Dhone (~55 km)",
+        "pin": "518222"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nandyal (~75 km)",
+        "pin": "518501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Gadwal (~60 km)",
+        "pin": "509125"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Adoni (~100 km)",
+        "pin": "518301"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mahbubnagar (~120 km)",
+        "pin": "509001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Anantapur (~145 km)",
+        "pin": "515001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ballari / Bellary (KA) (~150 km)",
+        "pin": "583101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kadapa (~195 km)",
+        "pin": "516001"
+      }
+    ],
+    "Nellore": [
+      {
+        "zone": "Central",
+        "area": "Nellore Bazar / Pogathota / Trunk Road / Ranganayakulapeta / ZP",
+        "pin": "524001"
+      },
+      {
+        "zone": "East",
+        "area": "A.C. Nagar / Balaji Nagar / Stonehousepet / Nawabpeta / Lakshmipuram",
+        "pin": "524002"
+      },
+      {
+        "zone": "West",
+        "area": "Dargamitta / Mulapeta / Magunta Layout / Ramalingapuram / Kondayapalem",
+        "pin": "524003"
+      },
+      {
+        "zone": "South",
+        "area": "Vedayapalem / Vengalarao Nagar / Andhrakesari Nagar / Buja Buja Nellore",
+        "pin": "524004"
+      },
+      {
+        "zone": "North",
+        "area": "Polytechnic / Kovur / Padugupadu",
+        "pin": "524005"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Venkatachalam / Chemudugunta",
+        "pin": "524320"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Muthukur / Krishnapatnam Port",
+        "pin": "524344"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Buchireddypalem",
+        "pin": "524305"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Gudur (~40 km)",
+        "pin": "524101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kavali (~55 km)",
+        "pin": "524201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Atmakur (~55 km)",
+        "pin": "524322"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Naidupeta (~70 km)",
+        "pin": "524126"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Sullurpeta / Sriharikota (~95 km)",
+        "pin": "524121"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kandukur (~95 km)",
+        "pin": "523105"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ongole (~130 km)",
+        "pin": "523001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tirupati (~135 km)",
+        "pin": "517501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kadapa (~175 km)",
+        "pin": "516001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chennai (TN) (~175 km)",
+        "pin": "600001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Guntur / Vijayawada (~250-280 km)",
+        "pin": "520001"
+      }
+    ],
+    "Tirupati": [
+      {
+        "zone": "Central",
+        "area": "Tirupati Bazar / Korlagunta / Balaji Colony / SV University",
+        "pin": "517501"
+      },
+      {
+        "zone": "East",
+        "area": "Renigunta / Airport Area",
+        "pin": "517520"
+      },
+      {
+        "zone": "North",
+        "area": "Tirumala Hills",
+        "pin": "517504"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Chandragiri / Sri City (Tada)",
+        "pin": "517101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chittoor (~70 km)",
+        "pin": "517001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Madanapalle (~120 km)",
+        "pin": "517325"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nellore (~135 km)",
+        "pin": "524001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kadapa (~140 km)",
+        "pin": "516001"
+      }
+    ]
+  }
+}

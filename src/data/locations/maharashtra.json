@@ -1,0 +1,329 @@
+{
+  "state": "Maharashtra",
+  "code": "MH",
+  "cities": {
+    "Mumbai": [
+      {
+        "zone": "South",
+        "area": "Fort / Nariman Point / Colaba / Churchgate",
+        "pin": "400001"
+      },
+      {
+        "zone": "South",
+        "area": "Marine Lines / Kalbadevi / Girgaon",
+        "pin": "400002"
+      },
+      {
+        "zone": "South",
+        "area": "Byculla / Mazgaon / Mumbai Central",
+        "pin": "400008"
+      },
+      {
+        "zone": "Central",
+        "area": "Parel / Lower Parel / Worli",
+        "pin": "400013"
+      },
+      {
+        "zone": "Central",
+        "area": "Dadar / Matunga / Sion",
+        "pin": "400014"
+      },
+      {
+        "zone": "Western Suburbs",
+        "area": "Bandra West / Khar West / BKC",
+        "pin": "400050"
+      },
+      {
+        "zone": "Western Suburbs",
+        "area": "Santacruz / Vile Parle / Airport",
+        "pin": "400055"
+      },
+      {
+        "zone": "Western Suburbs",
+        "area": "Andheri West / Lokhandwala / Versova",
+        "pin": "400053"
+      },
+      {
+        "zone": "Western Suburbs",
+        "area": "Andheri East / Chakala / Marol / MIDC",
+        "pin": "400069"
+      },
+      {
+        "zone": "Western Suburbs",
+        "area": "Goregaon / Malad",
+        "pin": "400064"
+      },
+      {
+        "zone": "Western Suburbs",
+        "area": "Kandivali / Borivali / Dahisar",
+        "pin": "400067"
+      },
+      {
+        "zone": "Central Suburbs",
+        "area": "Kurla / Chembur / Ghatkopar",
+        "pin": "400070"
+      },
+      {
+        "zone": "Central Suburbs",
+        "area": "Powai / Vikhroli / Kanjurmarg",
+        "pin": "400076"
+      },
+      {
+        "zone": "Central Suburbs",
+        "area": "Bhandup / Mulund",
+        "pin": "400080"
+      },
+      {
+        "zone": "MMR / Outskirts",
+        "area": "Thane West / Ghodbunder Road",
+        "pin": "400601"
+      },
+      {
+        "zone": "MMR / Outskirts",
+        "area": "Vashi / Nerul / Belapur / Kharghar (Navi Mumbai)",
+        "pin": "400703"
+      },
+      {
+        "zone": "MMR / Outskirts",
+        "area": "Kalyan / Dombivli / Ulhasnagar",
+        "pin": "421301"
+      },
+      {
+        "zone": "MMR / Outskirts",
+        "area": "Vasai / Virar / Mira-Bhayandar",
+        "pin": "401202"
+      },
+      {
+        "zone": "MMR / Outskirts",
+        "area": "Panvel / Uran / JNPT",
+        "pin": "410206"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Lonavala / Khandala (~85 km)",
+        "pin": "410401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Alibaug / Pen (~95 km)",
+        "pin": "402201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Pune (~150 km)",
+        "pin": "411001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nashik (~165 km)",
+        "pin": "422001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Vapi / Daman (~175 km)",
+        "pin": "396191"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Surat (GJ) (~285 km)",
+        "pin": "395001"
+      }
+    ],
+    "Pune": [
+      {
+        "zone": "Central",
+        "area": "Camp / MG Road / Koregaon Park / Bund Garden",
+        "pin": "411001"
+      },
+      {
+        "zone": "Central",
+        "area": "Shivajinagar / Deccan Gymkhana / JM Road / FC Road",
+        "pin": "411004"
+      },
+      {
+        "zone": "West",
+        "area": "Kothrud / Paud Road / Karve Nagar",
+        "pin": "411038"
+      },
+      {
+        "zone": "West",
+        "area": "Aundh / Baner / Balewadi",
+        "pin": "411045"
+      },
+      {
+        "zone": "East",
+        "area": "Viman Nagar / Kalyani Nagar / Yerwada",
+        "pin": "411014"
+      },
+      {
+        "zone": "East",
+        "area": "Hadapsar / Magarpatta City / Amanora",
+        "pin": "411028"
+      },
+      {
+        "zone": "East",
+        "area": "Kharadi / Wagholi / EON IT Park",
+        "pin": "411014"
+      },
+      {
+        "zone": "South",
+        "area": "Katraj / Kondhwa / Bibwewadi / Dhankawadi",
+        "pin": "411046"
+      },
+      {
+        "zone": "South",
+        "area": "Sinhagad Road / Warje / Nanded City",
+        "pin": "411051"
+      },
+      {
+        "zone": "PCMC",
+        "area": "Pimpri / Chinchwad / Akurdi / Nigdi",
+        "pin": "411018"
+      },
+      {
+        "zone": "PCMC",
+        "area": "Wakad / Pimple Saudagar / Rahatani",
+        "pin": "411057"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Hinjawadi IT Park (Phase 1, 2, 3)",
+        "pin": "411057"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Chakan / Talegaon MIDC",
+        "pin": "410501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Lonavala (~65 km)",
+        "pin": "410401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Satara (~115 km)",
+        "pin": "415001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ahmednagar (~120 km)",
+        "pin": "414001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mumbai (~150 km)",
+        "pin": "400001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nashik (~210 km)",
+        "pin": "422001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kolhapur (~235 km)",
+        "pin": "416001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chhatrapati Sambhajinagar / Aurangabad (~235 km)",
+        "pin": "431001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Solapur (~250 km)",
+        "pin": "413001"
+      }
+    ],
+    "Nagpur": [
+      {
+        "zone": "Central",
+        "area": "Sitabuldi / Civil Lines / Sadar",
+        "pin": "440001"
+      },
+      {
+        "zone": "West",
+        "area": "Dharampeth / Ramdaspeth / Shankar Nagar",
+        "pin": "440010"
+      },
+      {
+        "zone": "South",
+        "area": "Manish Nagar / Wardha Road / MIHAN",
+        "pin": "440015"
+      },
+      {
+        "zone": "East",
+        "area": "Wardhaman Nagar / Itwari / Mahal",
+        "pin": "440008"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Hingna / Butibori MIDC / Kamptee",
+        "pin": "441110"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Wardha (~75 km)",
+        "pin": "442001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bhandara / Gondia (~65-170 km)",
+        "pin": "441904"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chandrapur (~150 km)",
+        "pin": "442401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Amravati (~155 km)",
+        "pin": "444601"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Jabalpur (MP) (~275 km)",
+        "pin": "482001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Raipur (CG) (~285 km)",
+        "pin": "492001"
+      }
+    ],
+    "Nashik": [
+      {
+        "zone": "Central",
+        "area": "Panchavati / College Road / Gangapur Road / CIDCO",
+        "pin": "422001"
+      },
+      {
+        "zone": "East",
+        "area": "Nashik Road / Deolali / Satpur MIDC / Ambad",
+        "pin": "422101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Shirdi (~90 km)",
+        "pin": "423109"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mumbai (~165 km)",
+        "pin": "400001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chhatrapati Sambhajinagar (~185 km)",
+        "pin": "431001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Pune (~210 km)",
+        "pin": "411001"
+      }
+    ]
+  }
+}

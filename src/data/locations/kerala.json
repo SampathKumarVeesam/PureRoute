@@ -1,0 +1,85 @@
+{
+  "state": "Kerala",
+  "code": "KL",
+  "cities": {
+    "Kochi": [
+      {
+        "zone": "Central",
+        "area": "MG Road / Ernakulam / Kadavanthra / Panampilly Nagar",
+        "pin": "682016"
+      },
+      {
+        "zone": "East",
+        "area": "Kakkanad / InfoPark / Edappally / Kalamassery",
+        "pin": "682030"
+      },
+      {
+        "zone": "West",
+        "area": "Fort Kochi / Mattancherry / Vypin",
+        "pin": "682001"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Aluva / Angamaly / Nedumbassery Airport",
+        "pin": "683101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Alappuzha (~55 km)",
+        "pin": "688001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Thrissur (~75 km)",
+        "pin": "680001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kottayam (~65 km)",
+        "pin": "686001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kozhikode / Calicut (~180 km)",
+        "pin": "673001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Coimbatore (TN) (~190 km)",
+        "pin": "641001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Thiruvananthapuram (~205 km)",
+        "pin": "695001"
+      }
+    ],
+    "Thiruvananthapuram": [
+      {
+        "zone": "Central",
+        "area": "MG Road / Thampanoor / Pattom / Kowdiar",
+        "pin": "695001"
+      },
+      {
+        "zone": "North",
+        "area": "Kazhakkoottam / Technopark / Kulathoor",
+        "pin": "695582"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kollam (~65 km)",
+        "pin": "691001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kanyakumari / Nagercoil (TN) (~70-90 km)",
+        "pin": "629001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kochi (~205 km)",
+        "pin": "682001"
+      }
+    ]
+  }
+}

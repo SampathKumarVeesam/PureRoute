@@ -1,0 +1,48 @@
+{
+  "state": "Rajasthan",
+  "code": "RJ",
+  "cities": {
+    "Jaipur": [
+      {
+        "zone": "Central",
+        "area": "MI Road / C-Scheme / Pink City / Raja Park",
+        "pin": "302001"
+      },
+      {
+        "zone": "South",
+        "area": "Malviya Nagar / Mansarovar / Tonk Road / Sitapura",
+        "pin": "302017"
+      },
+      {
+        "zone": "West",
+        "area": "Vaishali Nagar / Sodala / Ajmer Road",
+        "pin": "302021"
+      },
+      {
+        "zone": "North",
+        "area": "Vidhyadhar Nagar / Jhotwara / Amer",
+        "pin": "302039"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ajmer / Kishangarh (~135 km)",
+        "pin": "305001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Alwar (~150 km)",
+        "pin": "301001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kota (~250 km)",
+        "pin": "324001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Delhi NCR (~280 km)",
+        "pin": "110001"
+      }
+    ]
+  }
+}

@@ -1,0 +1,45 @@
+{
+  "state": "Madhya Pradesh",
+  "code": "MP",
+  "cities": {
+    "Indore": [
+      {
+        "zone": "Central",
+        "area": "MG Road / Rajwada / Palasia / Vijay Nagar",
+        "pin": "452001"
+      },
+      {
+        "zone": "West",
+        "area": "Super Corridor / Rau / Bhawarkua / Pithampur",
+        "pin": "452010"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ujjain / Dewas (~40-55 km)",
+        "pin": "456001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bhopal (~195 km)",
+        "pin": "462001"
+      }
+    ],
+    "Bhopal": [
+      {
+        "zone": "Central",
+        "area": "MP Nagar / New Market / Arera Colony / Kolar Road",
+        "pin": "462011"
+      },
+      {
+        "zone": "North",
+        "area": "Bairagarh / Mandideep Industrial Area",
+        "pin": "462030"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Indore (~195 km)",
+        "pin": "452001"
+      }
+    ]
+  }
+}

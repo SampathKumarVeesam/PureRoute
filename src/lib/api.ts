@@ -1,6 +1,7 @@
 import type {
   AgentMaskedOrder,
   DairyProduct,
+  DeliveryLocationItem,
   EmailDispatchLog,
   GenderOption,
   MilkSubscription,
@@ -238,6 +239,16 @@ export const api = {
       body: JSON.stringify({ stockQty, harvestNote }),
     }),
   getMerchantOrders: () => request<OrderRecord[]>('/api/merchant/orders'),
+  getMerchantLocations: () =>
+    request<{ locations: DeliveryLocationItem[] }>('/api/merchant/locations'),
+  updateMerchantLocations: (locations: DeliveryLocationItem[]) =>
+    request<{ message: string; locations: DeliveryLocationItem[]; user: PublicUser }>(
+      '/api/merchant/locations',
+      {
+        method: 'PUT',
+        body: JSON.stringify({ locations }),
+      }
+    ),
 
   // Delivery Agent Portal
   agentHeartbeat: (coords?: { lat: number; lng: number }) =>

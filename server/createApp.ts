@@ -13,6 +13,7 @@ import {
   formatIndianPhone,
   isValidIndianPhone,
   type AgentMaskedOrder,
+  type DeliveryLocationItem,
   type MilkSubscription,
   type OrderRecord,
   type UserRecord,
@@ -917,8 +918,11 @@ export function createApp(): express.Application {
       user.avatarUrl = String(avatarUrl);
     }
     if (address !== undefined) user.address = String(address);
-    if (pinCode && /^500\d{3}$/.test(String(pinCode))) {
+    if (pinCode && /^\d{6}$/.test(String(pinCode))) {
       user.pinCode = String(pinCode);
+    }
+    if (Array.isArray(req.body?.deliveryLocations) && (user.role === 'merchant' || user.role === 'admin')) {
+      user.deliveryLocations = req.body.deliveryLocations.slice(0, 3);
     }
     if (coordinates && typeof coordinates.lat === 'number' && typeof coordinates.lng === 'number') {
       user.coordinates = coordinates;
@@ -959,14 +963,25 @@ export function createApp(): express.Application {
   // ==========================================
   app.get('/api/products', (_req: Request, res: Response) => {
     const store = getStore();
-    res.json(store.products);
+    const enriched = store.products.map((p) => {
+      const merchant = store.users.find((u) => u.id === p.merchantId);
+      return {
+        ...p,
+        deliveryLocations: merchant?.deliveryLocations || p.deliveryLocations || [],
+      };
+    });
+    res.json(enriched);
   });
 
   app.get('/api/products/:id', (req: Request, res: Response) => {
     const store = getStore();
     const prod = store.products.find((p) => p.id === Number(req.params.id));
     if (!prod) return res.status(404).json({ error: 'Product not found' });
-    res.json(prod);
+    const merchant = store.users.find((u) => u.id === prod.merchantId);
+    res.json({
+      ...prod,
+      deliveryLocations: merchant?.deliveryLocations || prod.deliveryLocations || [],
+    });
   });
 
   app.get('/api/subscriptions', (req: AuthedRequest, res: Response) => {
@@ -1043,7 +1058,7 @@ export function createApp(): express.Application {
   app.post(['/api/orders', '/api/orders/checkout'], requireAuth(['customer', 'admin']), async (req: AuthedRequest, res: Response) => {
     try {
       const user = req.currentUser!;
-      const { items, paymentMethod, deliveryAddress, pinCode, deliverySlot, isSubscription, subscriptionFrequency } =
+      const { items, paymentMethod, deliveryAddress, pinCode, deliverySlot, isSubscription, subscriptionFrequency, lat, lng } =
         req.body || {};
 
       if (!Array.isArray(items) || items.length === 0) {
@@ -1073,9 +1088,14 @@ export function createApp(): express.Application {
 
       const totalInr = subtotal + DELIVERY_FEE_INR;
       const cleanAddress = String(deliveryAddress || user.address || 'Madhapur, Hyderabad, TG');
-      const cleanPin = /^500\d{3}$/.test(String(pinCode || user.pinCode))
+      const cleanPin = /^\d{6}$/.test(String(pinCode || user.pinCode))
         ? String(pinCode || user.pinCode)
         : '500081';
+
+      const targetCoords =
+        typeof lat === 'number' && typeof lng === 'number'
+          ? { lat, lng }
+          : user.coordinates || { lat: 17.4486, lng: 78.3908 };
 
       const now = new Date().toISOString();
       const orderNum = `PR-HYD-${Math.floor(1000 + Math.random() * 9000)}`;
@@ -1090,7 +1110,7 @@ export function createApp(): express.Application {
         customerPhone: user.phone,
         deliveryAddress: cleanAddress,
         pinCode: cleanPin,
-        deliveryCoordinates: user.coordinates || { lat: 17.4486, lng: 78.3908 },
+        deliveryCoordinates: targetCoords,
         deliverySlot: deliverySlot || 'Morning (05:30 - 07:30 AM)',
         isSubscription: Boolean(isSubscription),
         subscriptionFrequency: subscriptionFrequency || 'Daily',
@@ -1628,6 +1648,46 @@ export function createApp(): express.Application {
       o.items.some((item) => myProductIds.has(item.productId))
     );
     res.json(merchantOrders);
+  });
+
+  app.get('/api/merchant/locations', requireAuth(['merchant', 'admin']), (req: AuthedRequest, res: Response) => {
+    const user = req.currentUser!;
+    res.json({ locations: user.deliveryLocations || [] });
+  });
+
+  app.put('/api/merchant/locations', requireAuth(['merchant', 'admin']), (req: AuthedRequest, res: Response) => {
+    const { locations } = req.body || {};
+    if (!Array.isArray(locations)) {
+      return res.status(400).json({ error: 'Locations array required' });
+    }
+    if (locations.length > 3) {
+      return res.status(400).json({ error: 'Maximum 3 delivery locations allowed' });
+    }
+    const clean: DeliveryLocationItem[] = locations.map((loc: any) => ({
+      state: String(loc.state || '').trim(),
+      city: String(loc.city || '').trim(),
+      area: String(loc.area || '').trim(),
+      pin: String(loc.pin || '').trim(),
+      zone: loc.zone ? String(loc.zone).trim() : undefined,
+    }));
+
+    const user = req.currentUser!;
+    user.deliveryLocations = clean;
+    user.updatedAt = new Date().toISOString();
+
+    const store = getStore();
+    for (const p of store.products) {
+      if (p.merchantId === user.id) {
+        p.deliveryLocations = clean;
+      }
+    }
+    saveStore();
+
+    res.json({
+      message: 'Merchant delivery locations updated successfully (Max 3)',
+      locations: clean,
+      user: sanitizeUser(user),
+    });
   });
 
   // ==========================================

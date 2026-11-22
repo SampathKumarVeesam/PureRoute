@@ -1,0 +1,212 @@
+{
+  "state": "Delhi NCR",
+  "code": "DL-NCR",
+  "cities": {
+    "New Delhi": [
+      {
+        "zone": "Central",
+        "area": "Connaught Place / Parliament Street / Mandi House",
+        "pin": "110001"
+      },
+      {
+        "zone": "Central",
+        "area": "Karol Bagh / Rajendra Place / Patel Nagar",
+        "pin": "110005"
+      },
+      {
+        "zone": "South",
+        "area": "Hauz Khas / Green Park / Safdarjung Enclave",
+        "pin": "110016"
+      },
+      {
+        "zone": "South",
+        "area": "Lajpat Nagar / Defence Colony / South Extension",
+        "pin": "110024"
+      },
+      {
+        "zone": "South",
+        "area": "Saket / Malviya Nagar / Greater Kailash",
+        "pin": "110017"
+      },
+      {
+        "zone": "South",
+        "area": "Vasant Kunj / Vasant Vihar / Munirka",
+        "pin": "110070"
+      },
+      {
+        "zone": "South",
+        "area": "Nehru Place / Kalkaji / Okhla Industrial Area",
+        "pin": "110019"
+      },
+      {
+        "zone": "West",
+        "area": "Rajouri Garden / Punjabi Bagh / Paschim Vihar",
+        "pin": "110027"
+      },
+      {
+        "zone": "West",
+        "area": "Janakpuri / Uttam Nagar / Vikaspuri",
+        "pin": "110058"
+      },
+      {
+        "zone": "West",
+        "area": "Dwarka (All Sectors) / IGI Airport",
+        "pin": "110075"
+      },
+      {
+        "zone": "North",
+        "area": "Civil Lines / Kamla Nagar / Delhi University",
+        "pin": "110007"
+      },
+      {
+        "zone": "North",
+        "area": "Pitampura / Rohini / Shalimar Bagh",
+        "pin": "110085"
+      },
+      {
+        "zone": "East",
+        "area": "Preet Vihar / Laxmi Nagar / Mayur Vihar",
+        "pin": "110092"
+      },
+      {
+        "zone": "NCR",
+        "area": "Ghaziabad / Vaishali / Kaushambi / Vasundhara",
+        "pin": "201001"
+      },
+      {
+        "zone": "NCR",
+        "area": "Faridabad / Ballabhgarh",
+        "pin": "121001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Sonipat / Panipat (HR) (~50-90 km)",
+        "pin": "131001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Meerut (UP) (~80 km)",
+        "pin": "250001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Rohtak / Rewari (HR) (~75-90 km)",
+        "pin": "124001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Aligarh / Mathura (UP) (~145-160 km)",
+        "pin": "202001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Karnal / Kurukshetra (HR) (~130-165 km)",
+        "pin": "132001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Agra (UP) (~230 km)",
+        "pin": "282001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Haridwar / Dehradun (UK) (~220-250 km)",
+        "pin": "249401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chandigarh (~245 km)",
+        "pin": "160017"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Jaipur (RJ) (~280 km)",
+        "pin": "302001"
+      }
+    ],
+    "Gurugram": [
+      {
+        "zone": "Central",
+        "area": "DLF Cyber City / Phase 1, 2, 3 / MG Road",
+        "pin": "122002"
+      },
+      {
+        "zone": "Central",
+        "area": "Sushant Lok / Sector 29 / Sector 44 / HUDA City Centre",
+        "pin": "122009"
+      },
+      {
+        "zone": "South",
+        "area": "Golf Course Road / Sector 54, 56",
+        "pin": "122011"
+      },
+      {
+        "zone": "South",
+        "area": "Sohna Road / Sector 48, 49 / Nirvana Country",
+        "pin": "122018"
+      },
+      {
+        "zone": "West",
+        "area": "Udyog Vihar / Old Gurugram / Sector 14",
+        "pin": "122001"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Manesar IMT / Dwarka Expressway / Sohna",
+        "pin": "122051"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bhiwadi / Dharuhera / Rewari (~45-65 km)",
+        "pin": "301019"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Alwar (RJ) (~135 km)",
+        "pin": "301001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Jaipur (RJ) (~245 km)",
+        "pin": "302001"
+      }
+    ],
+    "Noida": [
+      {
+        "zone": "Central",
+        "area": "Sector 18 / Sector 15, 16 / Atta Market",
+        "pin": "201301"
+      },
+      {
+        "zone": "North",
+        "area": "Sector 62, 63 (IT Hub) / Indirapuram",
+        "pin": "201309"
+      },
+      {
+        "zone": "South",
+        "area": "Noida Expressway / Sector 125, 135, 137",
+        "pin": "201304"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Greater Noida / Pari Chowk / Knowledge Park / Jewar",
+        "pin": "201310"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bulandshahr / Hapur (~60 km)",
+        "pin": "203001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Aligarh / Mathura (~130 km)",
+        "pin": "202001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Agra (~200 km)",
+        "pin": "282001"
+      }
+    ]
+  }
+}

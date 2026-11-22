@@ -1,0 +1,227 @@
+{
+  "state": "Tamil Nadu",
+  "code": "TN",
+  "cities": {
+    "Chennai": [
+      {
+        "zone": "North",
+        "area": "Parrys / George Town / Broadway",
+        "pin": "600001"
+      },
+      {
+        "zone": "Central",
+        "area": "Anna Salai / Mount Road / Egmore / Nungambakkam",
+        "pin": "600002"
+      },
+      {
+        "zone": "Central",
+        "area": "Mylapore / Alwarpet / Royapettah / Triplicane",
+        "pin": "600004"
+      },
+      {
+        "zone": "Central",
+        "area": "T. Nagar / West Mambalam / Kodambakkam",
+        "pin": "600017"
+      },
+      {
+        "zone": "West",
+        "area": "Anna Nagar / Kilpauk / Shenoy Nagar",
+        "pin": "600040"
+      },
+      {
+        "zone": "West",
+        "area": "Vadapalani / Ashok Nagar / KK Nagar",
+        "pin": "600026"
+      },
+      {
+        "zone": "West",
+        "area": "Ambattur Industrial Estate / Avadi",
+        "pin": "600053"
+      },
+      {
+        "zone": "West",
+        "area": "Porur / Ramapuram / Valasaravakkam",
+        "pin": "600116"
+      },
+      {
+        "zone": "South",
+        "area": "Adyar / Besant Nagar / Thiruvanmiyur",
+        "pin": "600020"
+      },
+      {
+        "zone": "South",
+        "area": "Guindy / Saidapet / Ekkatuthangal",
+        "pin": "600032"
+      },
+      {
+        "zone": "South",
+        "area": "Velachery / Taramani / Perungudi (OMR)",
+        "pin": "600042"
+      },
+      {
+        "zone": "South",
+        "area": "Pallavaram / Chromepet / Tambaram",
+        "pin": "600045"
+      },
+      {
+        "zone": "South",
+        "area": "Sholinganallur / Thoraipakkam / Karapakkam (OMR)",
+        "pin": "600119"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Siruseri IT Park / Kelambakkam / Navalur",
+        "pin": "603103"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Sriperumbudur / Poonamallee / Oragadam",
+        "pin": "602105"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Gummidipoondi / Ennore / Minjur",
+        "pin": "601201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Chengalpattu / Mahabalipuram (~60 km)",
+        "pin": "603001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kanchipuram (~75 km)",
+        "pin": "631501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tirupati (AP) (~135 km)",
+        "pin": "517501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Vellore (~140 km)",
+        "pin": "632001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Puducherry (~155 km)",
+        "pin": "605001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nellore (AP) (~175 km)",
+        "pin": "524001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Villupuram (~165 km)",
+        "pin": "605602"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Cuddalore (~185 km)",
+        "pin": "607001"
+      }
+    ],
+    "Coimbatore": [
+      {
+        "zone": "Central",
+        "area": "Town Hall / Gandhipuram / RS Puram / Race Course",
+        "pin": "641001"
+      },
+      {
+        "zone": "East",
+        "area": "Peelamedu / Avinashi Road / Airport / Singanallur",
+        "pin": "641004"
+      },
+      {
+        "zone": "North",
+        "area": "Saravanampatti / Ganapathy / Thudiyalur",
+        "pin": "641035"
+      },
+      {
+        "zone": "South",
+        "area": "Podanur / Ukkadam / Kuniyamuthur",
+        "pin": "641023"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Sulur / Pollachi / Mettupalayam",
+        "pin": "641402"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tiruppur (~55 km)",
+        "pin": "641601"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Palakkad (KL) (~55 km)",
+        "pin": "678001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ooty / Nilgiris (~85 km)",
+        "pin": "643001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Erode (~100 km)",
+        "pin": "638001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Salem (~165 km)",
+        "pin": "636001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kochi (KL) (~190 km)",
+        "pin": "682001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Madurai (~215 km)",
+        "pin": "625001"
+      }
+    ],
+    "Madurai": [
+      {
+        "zone": "Central",
+        "area": "Meenakshi Temple / Periyar / Simmakkal / Town Hall",
+        "pin": "625001"
+      },
+      {
+        "zone": "North",
+        "area": "Anna Nagar / KK Nagar / Mattuthavani / Tallakulam",
+        "pin": "625020"
+      },
+      {
+        "zone": "South",
+        "area": "Thiruparankundram / Tirumangalam / Kappalur",
+        "pin": "625005"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Dindigul (~65 km)",
+        "pin": "624001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tiruchirappalli / Trichy (~135 km)",
+        "pin": "620001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tirunelveli (~160 km)",
+        "pin": "627001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Coimbatore (~215 km)",
+        "pin": "641001"
+      }
+    ]
+  }
+}

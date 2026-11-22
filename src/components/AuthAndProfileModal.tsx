@@ -16,7 +16,6 @@ import {
 import { api, setAuthToken } from '../lib/api';
 import { getPresetsByGender, resolveAvatarSrc } from '../lib/avatars';
 import {
-  HYDERABAD_AREAS,
   formatIndianPhone,
   type GenderOption,
   type PublicUser,
@@ -87,8 +86,8 @@ export const AuthAndProfileModal: React.FC<AuthModalProps> = ({
   const [regPhoneDigits, setRegPhoneDigits] = useState('98480');
   const [regGender, setRegGender] = useState<GenderOption>('Female');
   const [regAvatar, setRegAvatar] = useState<string>('preset:female-1');
-  const [regAddress, setRegAddress] = useState<string>(HYDERABAD_AREAS[0].label + ', Hyderabad, TG');
-  const [regPinCode, setRegPinCode] = useState<string>(HYDERABAD_AREAS[0].pinCode);
+  const [regAddress, setRegAddress] = useState<string>('Madhapur / Hitech City, Hyderabad, TG');
+  const [regPinCode, setRegPinCode] = useState<string>('500081');
   const [regFarmName, setRegFarmName] = useState('');
 
   const [pendingVerifyToken, setPendingVerifyToken] = useState<string | null>(null);

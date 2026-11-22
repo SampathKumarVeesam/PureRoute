@@ -1,0 +1,254 @@
+{
+  "state": "Karnataka",
+  "code": "KA",
+  "cities": {
+    "Bengaluru": [
+      {
+        "zone": "Central",
+        "area": "MG Road / Brigade Road / Shivajinagar / Vasanth Nagar",
+        "pin": "560001"
+      },
+      {
+        "zone": "Central",
+        "area": "Majestic / Gandhinagar / Chickpet",
+        "pin": "560009"
+      },
+      {
+        "zone": "West",
+        "area": "Malleshwaram / Rajajinagar / Mahalakshmi Layout",
+        "pin": "560003"
+      },
+      {
+        "zone": "West",
+        "area": "Vijayanagar / Nagarbhavi / Kengeri",
+        "pin": "560040"
+      },
+      {
+        "zone": "South",
+        "area": "Jayanagar / Basavanagudi / JP Nagar",
+        "pin": "560011"
+      },
+      {
+        "zone": "South",
+        "area": "Koramangala / Adugodi / Madiwala",
+        "pin": "560034"
+      },
+      {
+        "zone": "South",
+        "area": "BTM Layout / Bannerghatta Road / Hulimavu",
+        "pin": "560076"
+      },
+      {
+        "zone": "South",
+        "area": "HSR Layout / Bommanahalli",
+        "pin": "560102"
+      },
+      {
+        "zone": "South",
+        "area": "Electronic City (Phase 1 & 2)",
+        "pin": "560100"
+      },
+      {
+        "zone": "East",
+        "area": "Indiranagar / Domlur / Ulsoor",
+        "pin": "560038"
+      },
+      {
+        "zone": "East",
+        "area": "Marathahalli / Bellandur / Sarjapur Road",
+        "pin": "560037"
+      },
+      {
+        "zone": "East",
+        "area": "Whitefield / ITPL / Brookefield / Hoodi",
+        "pin": "560066"
+      },
+      {
+        "zone": "East",
+        "area": "KR Puram / Mahadevapura",
+        "pin": "560036"
+      },
+      {
+        "zone": "North",
+        "area": "Hebbal / RT Nagar / Sahakarnagar",
+        "pin": "560024"
+      },
+      {
+        "zone": "North",
+        "area": "Yelahanka / Jakkur / Kogilu",
+        "pin": "560064"
+      },
+      {
+        "zone": "North",
+        "area": "Manyata Tech Park / Nagawara / Hennur",
+        "pin": "560045"
+      },
+      {
+        "zone": "North",
+        "area": "Peenya Industrial Area / Yeshwanthpur / Jalahalli",
+        "pin": "560022"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Devanahalli / Kempegowda International Airport",
+        "pin": "560300"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Nelamangala / Bidadi / Jigani / Hoskote",
+        "pin": "562123"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Hosur (TN) (~40 km)",
+        "pin": "635109"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tumakuru (~70 km)",
+        "pin": "572101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kolar (~70 km)",
+        "pin": "563101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mandya (~100 km)",
+        "pin": "571401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mysuru (~145 km)",
+        "pin": "570001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Hassan (~185 km)",
+        "pin": "573201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Salem (TN) (~200 km)",
+        "pin": "636001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Anantapur (AP) (~215 km)",
+        "pin": "515001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Tirupati (AP) (~250 km)",
+        "pin": "517501"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Davanagere (~265 km)",
+        "pin": "577001"
+      }
+    ],
+    "Mysuru": [
+      {
+        "zone": "Central",
+        "area": "Devaraja Mohalla / Sayyaji Rao Road / Mandi Mohalla",
+        "pin": "570001"
+      },
+      {
+        "zone": "West",
+        "area": "Vijayanagar / Gokulam / Jayalakshmipuram",
+        "pin": "570012"
+      },
+      {
+        "zone": "South",
+        "area": "Kuvempunagar / Saraswathipuram / JP Nagar",
+        "pin": "570023"
+      },
+      {
+        "zone": "North",
+        "area": "Hebbal Industrial Area / Infosys Campus",
+        "pin": "570016"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mandya (~45 km)",
+        "pin": "571401"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Madikeri / Coorg (~120 km)",
+        "pin": "571201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bengaluru (~145 km)",
+        "pin": "560001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Coimbatore (TN) (~200 km)",
+        "pin": "641001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mangaluru (~255 km)",
+        "pin": "575001"
+      }
+    ],
+    "Hubballi-Dharwad": [
+      {
+        "zone": "Central",
+        "area": "Hubballi Keshwapur / Vidyanagar / Gokul Road",
+        "pin": "580020"
+      },
+      {
+        "zone": "West",
+        "area": "Dharwad Central / SDM / Karnatak University",
+        "pin": "580001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Belagavi (~95 km)",
+        "pin": "590001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Davanagere (~145 km)",
+        "pin": "577001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Goa / Panaji (~185 km)",
+        "pin": "403001"
+      }
+    ],
+    "Mangaluru": [
+      {
+        "zone": "Central",
+        "area": "Hampankatta / Balmatta / Kadri / Bejai",
+        "pin": "575001"
+      },
+      {
+        "zone": "North",
+        "area": "Surathkal / NITK / Baikampady Industrial Area",
+        "pin": "575025"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Udupi / Manipal (~55 km)",
+        "pin": "576101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kannur (KL) (~140 km)",
+        "pin": "670001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mysuru (~255 km)",
+        "pin": "570001"
+      }
+    ]
+  }
+}

@@ -48,6 +48,13 @@ export interface IUserDocument extends Document {
   mustChangePassword: boolean;
   farmName?: string;
   merchantVerified?: boolean;
+  deliveryLocations?: Array<{
+    state: string;
+    city: string;
+    area: string;
+    pin: string;
+    zone?: string;
+  }>;
   isLoggedIn: boolean;
   lastActiveAt?: string;
   fifoQueueJoinedAt?: string | null;
@@ -96,6 +103,18 @@ const userSchema = new Schema<IUserDocument>(
     mustChangePassword: { type: Boolean, default: false },
     farmName: { type: String },
     merchantVerified: { type: Boolean, default: false },
+    deliveryLocations: {
+      type: [
+        {
+          state: { type: String, required: true },
+          city: { type: String, required: true },
+          area: { type: String, required: true },
+          pin: { type: String, required: true },
+          zone: { type: String },
+        },
+      ],
+      default: undefined,
+    },
     isLoggedIn: { type: Boolean, default: false },
     lastActiveAt: { type: String },
     fifoQueueJoinedAt: { type: String, default: null },
@@ -129,6 +148,13 @@ export interface IProductDocument extends Document {
   supportsSubscription: boolean;
   ratingAvg: number;
   reviewCount: number;
+  deliveryLocations?: Array<{
+    state: string;
+    city: string;
+    area: string;
+    pin: string;
+    zone?: string;
+  }>;
 }
 
 const productSchema = new Schema<IProductDocument>(
@@ -154,6 +180,18 @@ const productSchema = new Schema<IProductDocument>(
     supportsSubscription: { type: Boolean, default: true },
     ratingAvg: { type: Number, default: 5.0 },
     reviewCount: { type: Number, default: 0 },
+    deliveryLocations: {
+      type: [
+        {
+          state: { type: String, required: true },
+          city: { type: String, required: true },
+          area: { type: String, required: true },
+          pin: { type: String, required: true },
+          zone: { type: String },
+        },
+      ],
+      default: undefined,
+    },
   },
   { ...schemaOptions, collection: 'products' }
 );

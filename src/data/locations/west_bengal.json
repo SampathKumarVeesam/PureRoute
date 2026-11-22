@@ -1,0 +1,88 @@
+{
+  "state": "West Bengal",
+  "code": "WB",
+  "cities": {
+    "Kolkata": [
+      {
+        "zone": "Central",
+        "area": "BBD Bagh / Dalhousie / Esplanade / Park Street",
+        "pin": "700001"
+      },
+      {
+        "zone": "Central",
+        "area": "Camac Street / Ballygunge / Theatre Road",
+        "pin": "700017"
+      },
+      {
+        "zone": "South",
+        "area": "Alipore / New Alipore / Kalighat / Bhawanipore",
+        "pin": "700027"
+      },
+      {
+        "zone": "South",
+        "area": "Gariahat / Jadavpur / Tollygunge / Lake Gardens",
+        "pin": "700029"
+      },
+      {
+        "zone": "South",
+        "area": "Garia / Behala / Kasba / EM Bypass",
+        "pin": "700084"
+      },
+      {
+        "zone": "North",
+        "area": "Shyambazar / Hatibagan / Sovabazar / Dum Dum",
+        "pin": "700004"
+      },
+      {
+        "zone": "East",
+        "area": "Salt Lake (Bidhannagar) Sector 1–5",
+        "pin": "700091"
+      },
+      {
+        "zone": "East",
+        "area": "New Town / Rajarhat / Eco Park / Airport",
+        "pin": "700156"
+      },
+      {
+        "zone": "Howrah",
+        "area": "Howrah Station / Shibpur / Liluah / Bally",
+        "pin": "711101"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Barasat / Barrackpore / Madhyamgram",
+        "pin": "700124"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Sonarpur / Baruipur / Dankuni",
+        "pin": "700150"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kalyani / Krishnanagar (~55-110 km)",
+        "pin": "741235"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bardhaman / Burdwan (~105 km)",
+        "pin": "713101"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Haldia / Kharagpur (~115-130 km)",
+        "pin": "721602"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Durgapur / Asansol (~170-210 km)",
+        "pin": "713201"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Jamshedpur (JH) (~275 km)",
+        "pin": "831001"
+      }
+    ]
+  }
+}

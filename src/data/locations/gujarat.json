@@ -1,0 +1,157 @@
+{
+  "state": "Gujarat",
+  "code": "GJ",
+  "cities": {
+    "Ahmedabad": [
+      {
+        "zone": "Central",
+        "area": "Lal Darwaja / Ashram Road / Navrangpura / CG Road",
+        "pin": "380009"
+      },
+      {
+        "zone": "West",
+        "area": "Satellite / Prahlad Nagar / Bodakdev / Vastrapur",
+        "pin": "380015"
+      },
+      {
+        "zone": "West",
+        "area": "SG Highway / Thaltej / Bopal / Shilaj",
+        "pin": "380054"
+      },
+      {
+        "zone": "North",
+        "area": "Sabarmati / Chandkheda / Motera",
+        "pin": "380005"
+      },
+      {
+        "zone": "East",
+        "area": "Maninagar / Naroda / Nikol / Odhav",
+        "pin": "380008"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "GIFT City / Gandhinagar / Sanand GIDC",
+        "pin": "382355"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nadiad / Anand (~55-75 km)",
+        "pin": "387001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mehsana (~75 km)",
+        "pin": "384001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Vadodara (~110 km)",
+        "pin": "390001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bhavnagar (~170 km)",
+        "pin": "364001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Rajkot (~215 km)",
+        "pin": "360001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Udaipur (RJ) (~260 km)",
+        "pin": "313001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Surat (~265 km)",
+        "pin": "395001"
+      }
+    ],
+    "Surat": [
+      {
+        "zone": "Central",
+        "area": "Ring Road / Athwalines / Nanpura / Adajan",
+        "pin": "395001"
+      },
+      {
+        "zone": "South",
+        "area": "Vesu / Piplod / Dumas Road / City Light",
+        "pin": "395007"
+      },
+      {
+        "zone": "North",
+        "area": "Katargam / Varachha / Kamrej",
+        "pin": "395004"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Hazira / Sachin GIDC / Bardoli",
+        "pin": "394270"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Navsari / Valsad (~35-70 km)",
+        "pin": "396445"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bharuch / Ankleshwar (~75 km)",
+        "pin": "392001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Vapi / Daman (~115 km)",
+        "pin": "396191"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Vadodara (~150 km)",
+        "pin": "390001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ahmedabad (~265 km)",
+        "pin": "380001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Mumbai (MH) (~285 km)",
+        "pin": "400001"
+      }
+    ],
+    "Vadodara": [
+      {
+        "zone": "Central",
+        "area": "Alkapuri / Sayajigunj / Fatehgunj / Raopura",
+        "pin": "390007"
+      },
+      {
+        "zone": "West",
+        "area": "Gotri / Vasna-Bhayli / Akota",
+        "pin": "390021"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Makarpura GIDC / Waghodia / Savli",
+        "pin": "390010"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Anand (~40 km)",
+        "pin": "388001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ahmedabad (~110 km)",
+        "pin": "380001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Surat (~150 km)",
+        "pin": "395001"
+      }
+    ]
+  }
+}

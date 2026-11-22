@@ -1,0 +1,99 @@
+{
+  "state": "Odisha, Bihar, Jharkhand & Chhattisgarh",
+  "code": "EAST-CENTRAL",
+  "cities": {
+    "Bhubaneswar (Odisha)": [
+      {
+        "zone": "Central",
+        "area": "Saheed Nagar / Master Canteen / Kharavela Nagar",
+        "pin": "751007"
+      },
+      {
+        "zone": "North",
+        "area": "Patia / Chandrasekharpur / Infocity / Nandankanan",
+        "pin": "751024"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Cuttack (~25 km) / Khordha",
+        "pin": "753001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Puri (~60 km)",
+        "pin": "752001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Brahmapur / Berhampur (~170 km)",
+        "pin": "760001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Rourkela / Sambalpur (~270-300 km)",
+        "pin": "769001"
+      }
+    ],
+    "Patna (Bihar)": [
+      {
+        "zone": "Central",
+        "area": "Fraser Road / Boring Road / Kankarbagh / Bailey Road",
+        "pin": "800001"
+      },
+      {
+        "zone": "West",
+        "area": "Danapur / Bihta / Phulwari Sharif",
+        "pin": "801503"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Muzaffarpur / Gaya (~75-105 km)",
+        "pin": "842001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bhagalpur / Darbhanga (~140-235 km)",
+        "pin": "812001"
+      }
+    ],
+    "Ranchi (Jharkhand)": [
+      {
+        "zone": "Central",
+        "area": "Main Road / Lalpur / Doranda / Hinoo / Kanke",
+        "pin": "834001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Jamshedpur (~130 km)",
+        "pin": "831001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bokaro / Dhanbad (~110-150 km)",
+        "pin": "827001"
+      }
+    ],
+    "Raipur (Chhattisgarh)": [
+      {
+        "zone": "Central",
+        "area": "Civil Lines / Pandri / Shankar Nagar / Telibandha",
+        "pin": "492001"
+      },
+      {
+        "zone": "Outskirts",
+        "area": "Nava Raipur / Atal Nagar / Bhilai-Durg (~35 km)",
+        "pin": "492015"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Bilaspur (~120 km)",
+        "pin": "495001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Nagpur (MH) (~285 km)",
+        "pin": "440001"
+      }
+    ]
+  }
+}

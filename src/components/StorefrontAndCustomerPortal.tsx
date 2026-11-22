@@ -15,7 +15,6 @@ import { api } from '../lib/api';
 import { resolveAvatarSrc } from '../lib/avatars';
 import { LiveHyderabadMap } from './LiveHyderabadMap';
 import {
-  HYDERABAD_AREAS,
   formatInr,
   type DairyProduct,
   type DeliverySlot,
@@ -23,7 +22,14 @@ import {
   type OrderRecord,
   type ProductReview,
   type PublicUser,
+  type DeliveryLocationItem,
 } from '../types/domain';
+import {
+  getAvailableStates,
+  getCitiesForState,
+  getAreasForCity,
+  getLocationCoordinates,
+} from '../lib/locations';
 
 interface StorefrontProps {
   currentUser: PublicUser | null;
@@ -71,15 +77,109 @@ export const StorefrontAndCustomerPortal: React.FC<StorefrontProps> = ({
   const [cartOpen, setCartOpen] = useState(false);
   const [selectedProduct, setSelectedProduct] = useState<DairyProduct | null>(null);
 
-  // Checkout state
-  const [selectedAreaIdx, setSelectedAreaIdx] = useState(1);
-  const [streetAddress, setStreetAddress] = useState(
-    currentUser?.address || 'Villa 14, Road No. 36, Jubilee Hills, Hyderabad, TG'
-  );
+  // Checkout & Location State
+  const [selectedState, setSelectedState] = useState<string>('Telangana');
+  const [selectedCity, setSelectedCity] = useState<string>('Hyderabad (Core + 300km Radius)');
+  const [selectedAreaIndex, setSelectedAreaIndex] = useState<number>(0);
+  const [manualHouseStreet, setManualHouseStreet] = useState<string>('');
+  const [manualPinCode, setManualPinCode] = useState<string>('500081');
   const [deliverySlot, setDeliverySlot] = useState<DeliverySlot>('Morning (05:30 - 07:30 AM)');
   const [paymentMethod, setPaymentMethod] = useState<'PREPAID' | 'COD'>('PREPAID');
   const [checkoutBusy, setCheckoutBusy] = useState(false);
   const [toast, setToast] = useState<string | null>(null);
+
+  // Check if any product in cart has merchant-configured delivery locations
+  const merchantAllowedLocations = React.useMemo<DeliveryLocationItem[]>(() => {
+    const list: DeliveryLocationItem[] = [];
+    for (const item of cart) {
+      if (item.product.deliveryLocations && item.product.deliveryLocations.length > 0) {
+        for (const loc of item.product.deliveryLocations) {
+          if (!list.some((l) => l.state === loc.state && l.city === loc.city && l.area === loc.area)) {
+            list.push(loc);
+          }
+        }
+      }
+    }
+    return list;
+  }, [cart]);
+
+  const isMerchantRestricted = merchantAllowedLocations.length > 0;
+
+  // Available states for checkout
+  const availableStates = React.useMemo(() => {
+    if (isMerchantRestricted) {
+      const states = Array.from(new Set(merchantAllowedLocations.map((l) => l.state)));
+      return states.length > 0 ? states : getAvailableStates();
+    }
+    return getAvailableStates();
+  }, [isMerchantRestricted, merchantAllowedLocations]);
+
+  // Cities for currently selected state
+  const availableCities = React.useMemo(() => {
+    if (isMerchantRestricted) {
+      const cities = Array.from(
+        new Set(
+          merchantAllowedLocations
+            .filter((l) => l.state === selectedState)
+            .map((l) => l.city)
+        )
+      );
+      return cities.length > 0 ? cities : getCitiesForState(selectedState);
+    }
+    return getCitiesForState(selectedState);
+  }, [isMerchantRestricted, merchantAllowedLocations, selectedState]);
+
+  // Localities / areas for currently selected state and city
+  const availableAreas = React.useMemo(() => {
+    if (isMerchantRestricted) {
+      const filtered = merchantAllowedLocations
+        .filter((l) => l.state === selectedState && l.city === selectedCity)
+        .map((l) => ({ zone: l.zone || 'Merchant Zone', area: l.area, pin: l.pin }));
+      return filtered.length > 0 ? filtered : getAreasForCity(selectedState, selectedCity);
+    }
+    return getAreasForCity(selectedState, selectedCity);
+  }, [isMerchantRestricted, merchantAllowedLocations, selectedState, selectedCity]);
+
+  // Ensure cascading values stay consistent when restrictions or selections change
+  React.useEffect(() => {
+    if (availableStates.length > 0 && !availableStates.includes(selectedState)) {
+      const nextSt = availableStates[0];
+      setSelectedState(nextSt);
+      const cities = isMerchantRestricted
+        ? Array.from(new Set(merchantAllowedLocations.filter((l) => l.state === nextSt).map((l) => l.city)))
+        : getCitiesForState(nextSt);
+      const nextCt = cities[0] || '';
+      setSelectedCity(nextCt);
+      setSelectedAreaIndex(0);
+      const areas = isMerchantRestricted
+        ? merchantAllowedLocations
+            .filter((l) => l.state === nextSt && l.city === nextCt)
+            .map((l) => ({ zone: l.zone || '', area: l.area, pin: l.pin }))
+        : getAreasForCity(nextSt, nextCt);
+      if (areas[0]?.pin) setManualPinCode(areas[0].pin);
+    }
+  }, [availableStates, selectedState, isMerchantRestricted, merchantAllowedLocations]);
+
+  React.useEffect(() => {
+    if (availableCities.length > 0 && !availableCities.includes(selectedCity)) {
+      const nextCt = availableCities[0];
+      setSelectedCity(nextCt);
+      setSelectedAreaIndex(0);
+      const areas = isMerchantRestricted
+        ? merchantAllowedLocations
+            .filter((l) => l.state === selectedState && l.city === nextCt)
+            .map((l) => ({ zone: l.zone || '', area: l.area, pin: l.pin }))
+        : getAreasForCity(selectedState, nextCt);
+      if (areas[0]?.pin) setManualPinCode(areas[0].pin);
+    }
+  }, [availableCities, selectedCity, selectedState, isMerchantRestricted, merchantAllowedLocations]);
+
+  React.useEffect(() => {
+    if (availableAreas.length > 0 && selectedAreaIndex >= availableAreas.length) {
+      setSelectedAreaIndex(0);
+      if (availableAreas[0]?.pin) setManualPinCode(availableAreas[0].pin);
+    }
+  }, [availableAreas, selectedAreaIndex]);
 
   // Subscription creation state
   const [subProductId, setSubProductId] = useState<number>(products[0]?.id || 101);
@@ -135,15 +235,30 @@ export const StorefrontAndCustomerPortal: React.FC<StorefrontProps> = ({
     }
     if (cart.length === 0) return;
 
+    if (!manualHouseStreet.trim()) {
+      showToast('Please enter your House / Flat No., Building & Street Location.');
+      return;
+    }
+
+    const cleanPin = manualPinCode.trim();
+    if (!/^\d{6}$/.test(cleanPin)) {
+      showToast('Please enter a valid 6-digit postal PIN code.');
+      return;
+    }
+
     setCheckoutBusy(true);
     try {
-      const area = HYDERABAD_AREAS[selectedAreaIdx] || HYDERABAD_AREAS[0];
+      const selectedAreaObj = availableAreas[selectedAreaIndex] || availableAreas[0];
+      const areaName = selectedAreaObj?.area || 'Delivery Zone';
+      const fullDeliveryAddress = `${manualHouseStreet.trim()}, ${areaName}, ${selectedCity}, ${selectedState}`;
+      const coords = getLocationCoordinates(selectedCity, cleanPin, selectedAreaIndex);
+
       const order = await api.createOrder({
         items: cart.map((c) => ({ productId: c.product.id, quantity: c.quantity })),
-        deliveryAddress: streetAddress || `${area.label}, Hyderabad, TG`,
-        pinCode: area.pinCode,
-        lat: area.lat,
-        lng: area.lng,
+        deliveryAddress: fullDeliveryAddress,
+        pinCode: cleanPin,
+        lat: coords.lat,
+        lng: coords.lng,
         deliverySlot,
         paymentMethod,
       });
@@ -151,7 +266,7 @@ export const StorefrontAndCustomerPortal: React.FC<StorefrontProps> = ({
       setCartOpen(false);
       await onRefreshData();
       setSection('orders');
-      showToast(`Order ${order.orderNumber} recorded at Madhapur Hub.`);
+      showToast(`Order ${order.orderNumber} placed for ${areaName} (PIN ${cleanPin}).`);
     } catch (err: any) {
       showToast(err.message);
     } finally {
@@ -954,38 +1069,139 @@ export const StorefrontAndCustomerPortal: React.FC<StorefrontProps> = ({
                   </div>
 
                   <form id="checkout-form" onSubmit={handleCheckout} className="space-y-4 pt-4 border-t border-[#e4cca2]/16">
+                    {isMerchantRestricted && (
+                      <div className="p-2.5 rounded-sm bg-[#d8b06c]/10 border border-[#d8b06c]/30 text-xs text-[#d8b06c] space-y-1">
+                        <div className="font-semibold flex items-center gap-1.5">
+                          <MapPin className="w-3.5 h-3.5 text-[#d8b06c]" />
+                          Merchant Delivery Restrictions Active
+                        </div>
+                        <p className="text-[11px] text-[#e4cca2]/80 leading-relaxed">
+                          Only delivery zones served by the selected farm partner ({merchantAllowedLocations.length} active zone{merchantAllowedLocations.length > 1 ? 's' : ''}) are available for this basket.
+                        </p>
+                      </div>
+                    )}
+
+                    {/* Cascading State & City Selectors */}
+                    <div className="grid grid-cols-2 gap-2.5">
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
+                          State
+                        </label>
+                        <select
+                          value={selectedState}
+                          onChange={(e) => {
+                            const st = e.target.value;
+                            setSelectedState(st);
+                            const cities = isMerchantRestricted
+                              ? Array.from(new Set(merchantAllowedLocations.filter((l) => l.state === st).map((l) => l.city)))
+                              : getCitiesForState(st);
+                            const nextCt = cities[0] || '';
+                            setSelectedCity(nextCt);
+                            setSelectedAreaIndex(0);
+                            const areas = isMerchantRestricted
+                              ? merchantAllowedLocations
+                                  .filter((l) => l.state === st && l.city === nextCt)
+                                  .map((l) => ({ zone: l.zone || '', area: l.area, pin: l.pin }))
+                              : getAreasForCity(st, nextCt);
+                            if (areas[0]?.pin) setManualPinCode(areas[0].pin);
+                          }}
+                          className="w-full rounded-sm classic-input px-3 py-2 text-xs"
+                        >
+                          {availableStates.map((st) => (
+                            <option key={st} value={st} className="bg-[#08121c]">
+                              {st}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+
+                      <div>
+                        <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
+                          City
+                        </label>
+                        <select
+                          value={selectedCity}
+                          onChange={(e) => {
+                            const ct = e.target.value;
+                            setSelectedCity(ct);
+                            setSelectedAreaIndex(0);
+                            const areas = isMerchantRestricted
+                              ? merchantAllowedLocations
+                                  .filter((l) => l.state === selectedState && l.city === ct)
+                                  .map((l) => ({ zone: l.zone || '', area: l.area, pin: l.pin }))
+                              : getAreasForCity(selectedState, ct);
+                            if (areas[0]?.pin) setManualPinCode(areas[0].pin);
+                          }}
+                          className="w-full rounded-sm classic-input px-3 py-2 text-xs"
+                        >
+                          {availableCities.map((ct) => (
+                            <option key={ct} value={ct} className="bg-[#08121c]">
+                              {ct}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                    </div>
+
+                    {/* Area / Locality Dropdown */}
                     <div>
                       <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
-                        Hyderabad Delivery Zone (PIN 500xxx)
+                        Delivery Locality / Area ({availableAreas.length} Available)
                       </label>
                       <select
-                        value={selectedAreaIdx}
+                        value={selectedAreaIndex}
                         onChange={(e) => {
                           const idx = Number(e.target.value);
-                          setSelectedAreaIdx(idx);
-                          setStreetAddress(`${HYDERABAD_AREAS[idx].label}, Hyderabad, TG`);
+                          setSelectedAreaIndex(idx);
+                          const targetArea = availableAreas[idx];
+                          if (targetArea?.pin) {
+                            setManualPinCode(targetArea.pin);
+                          }
                         }}
                         className="w-full rounded-sm classic-input px-3 py-2.5 text-xs"
                       >
-                        {HYDERABAD_AREAS.map((a, idx) => (
-                          <option key={a.pinCode} value={idx} className="bg-[#08121c]">
-                            {a.label} — PIN {a.pinCode}
+                        {availableAreas.map((loc, idx) => (
+                          <option key={`${loc.area}-${idx}`} value={idx} className="bg-[#08121c]">
+                            {loc.area} {loc.zone ? `(${loc.zone})` : ''} {loc.pin ? `— PIN ${loc.pin}` : ''}
                           </option>
                         ))}
                       </select>
                     </div>
 
+                    {/* Manual Address Entry: House / Flat No., Building & Street */}
                     <div>
                       <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5">
-                        Residence / Landmark
+                        House / Flat No., Building & Street Location <span className="text-[#d8b06c]">*</span>
                       </label>
                       <input
                         type="text"
                         required
-                        value={streetAddress}
-                        onChange={(e) => setStreetAddress(e.target.value)}
+                        placeholder="e.g. Flat 302, Sri Sai Towers, Road No. 12"
+                        value={manualHouseStreet}
+                        onChange={(e) => setManualHouseStreet(e.target.value)}
                         className="w-full rounded-sm classic-input px-3 py-2.5 text-xs"
                       />
+                    </div>
+
+                    {/* Manual Pincode Entry (6 Digits Validation) */}
+                    <div>
+                      <label className="block text-[11px] uppercase tracking-[0.14em] text-[#a5b0ba] mb-1.5 flex items-center justify-between">
+                        <span>Postal PIN Code (6 Digits) <span className="text-[#d8b06c]">*</span></span>
+                        <span className="text-[10px] lowercase text-[#9aa4ae]">e.g. 500xxx for hyderabad</span>
+                      </label>
+                      <input
+                        type="text"
+                        required
+                        maxLength={6}
+                        pattern="[0-9]{6}"
+                        placeholder="e.g. 500081"
+                        value={manualPinCode}
+                        onChange={(e) => setManualPinCode(e.target.value.replace(/\D/g, '').slice(0, 6))}
+                        className="w-full rounded-sm classic-input px-3 py-2.5 text-xs font-mono-tabular"
+                      />
+                      {manualPinCode.length > 0 && manualPinCode.length !== 6 && (
+                        <p className="mt-1 text-[10px] text-amber-400">PIN code must be exactly 6 digits</p>
+                      )}
                     </div>
 
                     <div>

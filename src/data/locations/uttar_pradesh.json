@@ -1,0 +1,87 @@
+{
+  "state": "Uttar Pradesh",
+  "code": "UP",
+  "cities": {
+    "Lucknow": [
+      {
+        "zone": "Central",
+        "area": "Hazratganj / Aminabad / Charbagh / Alambagh",
+        "pin": "226001"
+      },
+      {
+        "zone": "East",
+        "area": "Gomti Nagar / Indira Nagar / Aliganj / Mahanagar",
+        "pin": "226010"
+      },
+      {
+        "zone": "South",
+        "area": "Ashiyana / LDA Colony / Shaheed Path / Airport",
+        "pin": "226012"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Kanpur (~90 km)",
+        "pin": "208001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ayodhya / Faizabad (~135 km)",
+        "pin": "224001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Prayagraj / Allahabad (~200 km)",
+        "pin": "211001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Gorakhpur (~270 km)",
+        "pin": "273001"
+      }
+    ],
+    "Kanpur": [
+      {
+        "zone": "Central",
+        "area": "Civil Lines / Mall Road / Swaroop Nagar / Kakadeo",
+        "pin": "208001"
+      },
+      {
+        "zone": "South",
+        "area": "Govind Nagar / Kidwai Nagar / Panki",
+        "pin": "208006"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Lucknow (~90 km)",
+        "pin": "226001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Prayagraj (~205 km)",
+        "pin": "211001"
+      }
+    ],
+    "Varanasi": [
+      {
+        "zone": "Central",
+        "area": "Godowlia / Sigra / Lanka / BHU / Cantonment",
+        "pin": "221001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Prayagraj (~125 km)",
+        "pin": "211001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Gorakhpur (~215 km)",
+        "pin": "273001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Patna (BR) (~255 km)",
+        "pin": "800001"
+      }
+    ]
+  }
+}

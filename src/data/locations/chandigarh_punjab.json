@@ -1,0 +1,53 @@
+{
+  "state": "Chandigarh & Punjab",
+  "code": "CH-PB",
+  "cities": {
+    "Chandigarh Tricity": [
+      {
+        "zone": "Central",
+        "area": "Sector 17 / Sector 22 / Sector 35 / IT Park",
+        "pin": "160017"
+      },
+      {
+        "zone": "Satellite",
+        "area": "Mohali (Phase 1–11 / Airport Road / Kharar)",
+        "pin": "160055"
+      },
+      {
+        "zone": "Satellite",
+        "area": "Panchkula / Zirakpur / Derabassi",
+        "pin": "134109"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ambala (~45 km)",
+        "pin": "134003"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Patiala (~70 km)",
+        "pin": "147001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Ludhiana (~105 km)",
+        "pin": "141001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Shimla (HP) (~115 km)",
+        "pin": "171001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Jalandhar / Amritsar (~150-230 km)",
+        "pin": "144001"
+      },
+      {
+        "zone": "Regional (60-300km)",
+        "area": "Delhi NCR (~245 km)",
+        "pin": "110001"
+      }
+    ]
+  }
+}

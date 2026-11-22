@@ -27,6 +27,14 @@ export interface Coordinates {
   lng: number;
 }
 
+export interface DeliveryLocationItem {
+  state: string;
+  city: string;
+  area: string;
+  pin: string;
+  zone?: string;
+}
+
 export interface UserRecord {
   id: string;
   googleId?: string;
@@ -38,7 +46,7 @@ export interface UserRecord {
   avatarUrl: string; // Preset avatar ID or base64 data:image/jpeg|png URI
   role: UserRole;
   address: string;
-  pinCode: string; // Hyderabad 500xxx
+  pinCode: string; // Indian 6-digit PIN
   coordinates: Coordinates;
   // Email verification & 2-step agent onboarding
   isEmailVerified: boolean;
@@ -49,6 +57,7 @@ export interface UserRecord {
   // Merchant fields
   farmName?: string;
   merchantVerified?: boolean;
+  deliveryLocations?: DeliveryLocationItem[];
   // Delivery Agent FIFO & Settlement fields
   isLoggedIn: boolean;
   lastActiveAt: string | null;
@@ -82,6 +91,7 @@ export interface DairyProduct {
   supportsSubscription: boolean;
   ratingAvg: number;
   reviewCount: number;
+  deliveryLocations?: DeliveryLocationItem[];
 }
 
 export interface OrderItem {
