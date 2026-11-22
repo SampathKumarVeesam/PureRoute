@@ -289,6 +289,7 @@ export async function ensureDbReady(): Promise<void> {
 
 export function createApp(): express.Application {
   const app = express();
+  app.enable('trust proxy');
 
   // CORS Middleware
   app.use((req, res, next) => {
@@ -325,17 +326,38 @@ export function createApp(): express.Application {
   // Initialize seed store
   getStore();
 
-  // OpenAPI 3.0 Swagger Documentation
-  app.get('/api/openapi.json', (_req, res) => {
+  // OpenAPI 3.0 Swagger Documentation & Spec Endpoints
+  const sendOpenApiJson = (_req: express.Request, res: express.Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
     res.json(openApiSpec);
+  };
+  app.get('/api/openapi.json', sendOpenApiJson);
+  app.get('/openapi.json', sendOpenApiJson);
+  app.get('/api-docs/openapi.json', sendOpenApiJson);
+
+  const swaggerOptions = {
+    customSiteTitle: 'PureRoute LocalMilkforYou — OpenAPI 3.0 Swagger',
+    customCssUrl: 'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui.min.css',
+    customJs: [
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-bundle.js',
+      'https://cdnjs.cloudflare.com/ajax/libs/swagger-ui/5.11.0/swagger-ui-standalone-preset.js',
+    ],
+    swaggerOptions: {
+      url: '/api/openapi.json',
+      persistAuthorization: true,
+      displayRequestDuration: true,
+    },
+  };
+
+  const swaggerHandler = swaggerUi.setup(openApiSpec, swaggerOptions);
+  app.use(['/api-docs', '/api/docs', '/docs'], swaggerUi.serve, swaggerHandler);
+  app.get(['/api-docs', '/api/docs', '/docs'], (req, res, next) => swaggerHandler(req, res, next));
+
+  // Root redirect to Swagger UI
+  app.get('/', (_req, res) => {
+    res.redirect('/api-docs');
   });
-  app.use(
-    '/api-docs',
-    swaggerUi.serve,
-    swaggerUi.setup(openApiSpec, {
-      customSiteTitle: 'PureRoute LocalMilkforYou — OpenAPI 3.0 Swagger',
-    })
-  );
 
   // Health & Public Email Sandbox Outbox
   app.get('/api/health', (_req, res) => {

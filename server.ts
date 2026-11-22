@@ -30,7 +30,15 @@ async function startServer() {
   } else {
     const distPath = path.resolve(process.cwd(), 'dist');
     app.use(express.static(distPath));
-    app.get('*', (_req, res) => {
+    app.get('*', (req, res, next) => {
+      if (
+        req.path.startsWith('/api') ||
+        req.path.startsWith('/api-docs') ||
+        req.path.startsWith('/docs') ||
+        req.path === '/openapi.json'
+      ) {
+        return next();
+      }
       res.sendFile(path.join(distPath, 'index.html'));
     });
   }

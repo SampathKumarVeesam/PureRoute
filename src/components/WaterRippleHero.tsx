@@ -1,6 +1,7 @@
 import React, { useEffect, useRef } from 'react';
 import { ArrowDownRight } from 'lucide-react';
 import type { PublicUser } from '../types/domain';
+import { SWAGGER_URL } from '../lib/api';
 
 const HERO_IMAGE_SRC = '/src/assets/images/hero_morning_water_dew_1795152909340.jpg';
 const SIM_SIZE = 512;
@@ -512,7 +513,7 @@ export const WaterRippleHero: React.FC<WaterRippleHeroProps> = ({ currentUser, o
           </button>
 
           <a
-            href="/api-docs"
+            href={SWAGGER_URL}
             target="_blank"
             rel="noreferrer"
             className="inline-flex items-center px-5 py-3.5 rounded-lg text-sm font-normal text-white/85 hover:text-white hover:bg-white/10 transition-colors whitespace-nowrap"

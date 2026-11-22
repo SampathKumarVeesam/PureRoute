@@ -10,7 +10,7 @@ import {
   Sparkles,
   UserCog,
 } from 'lucide-react';
-import { api, getAuthToken, setAuthToken } from './lib/api';
+import { api, getAuthToken, setAuthToken, SWAGGER_URL } from './lib/api';
 import { resolveAvatarSrc } from './lib/avatars';
 import { WaterRippleHero } from './components/WaterRippleHero';
 import { StorefrontAndCustomerPortal } from './components/StorefrontAndCustomerPortal';
@@ -548,7 +548,7 @@ function PureRouteShell() {
               </button>
             ))}
             <a
-              href="/api-docs"
+              href={SWAGGER_URL}
               target="_blank"
               rel="noreferrer"
               className="py-2 border-b border-transparent text-[#a5b0ba] hover:text-[#f8f5ef] transition-colors whitespace-nowrap shrink-0"
@@ -626,7 +626,7 @@ function PureRouteShell() {
             {v.label}
           </button>
         ))}
-        <a href="/api-docs" target="_blank" rel="noreferrer" className="whitespace-nowrap">
+        <a href={SWAGGER_URL} target="_blank" rel="noreferrer" className="whitespace-nowrap">
           Swagger
         </a>
       </div>
@@ -791,7 +791,7 @@ function PureRouteShell() {
             >
               Return to Dawn Hero
             </button>
-            <a href="/api-docs" target="_blank" rel="noreferrer" className="hover:text-[#f3efe8] transition-colors">
+            <a href={SWAGGER_URL} target="_blank" rel="noreferrer" className="hover:text-[#f3efe8] transition-colors">
               OpenAPI 3.0 Swagger
             </a>
           </div>

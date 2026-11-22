@@ -7,6 +7,18 @@
   node_bundler = "esbuild"
 
 [[redirects]]
+  from = "/api-docs*"
+  to = "https://pureroute.onrender.com/api-docs:splat"
+  status = 200
+  force = true
+
+[[redirects]]
+  from = "/docs*"
+  to = "https://pureroute.onrender.com/docs:splat"
+  status = 200
+  force = true
+
+[[redirects]]
   from = "/api/*"
   to = "https://pureroute.onrender.com/api/:splat"
   status = 200

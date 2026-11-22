@@ -32,7 +32,7 @@ export function getAuthToken(): string | null {
   return authToken;
 }
 
-function getBaseUrl(): string {
+export function getBaseUrl(): string {
   const envUrl = (import.meta as any).env?.VITE_API_URL;
   if (envUrl && typeof envUrl === 'string' && envUrl.trim().length > 0) {
     return envUrl.trim().replace(/\/+$/, '');
@@ -46,6 +46,13 @@ function getBaseUrl(): string {
   }
   return '';
 }
+
+export const SWAGGER_URL =
+  typeof window !== 'undefined' &&
+  window.location.hostname !== 'localhost' &&
+  window.location.hostname !== '127.0.0.1'
+    ? 'https://pureroute.onrender.com/api-docs'
+    : '/api-docs';
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);

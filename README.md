@@ -19,7 +19,7 @@
 [![Express](https://img.shields.io/badge/Express-4.21-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
 [![MongoDB Atlas](https://img.shields.io/badge/MongoDB-Atlas_8.0-47A248?style=for-the-badge&logo=mongodb&logoColor=white)](https://www.mongodb.com/atlas)
 [![WebGL2](https://img.shields.io/badge/WebGL2-Shader_Pipeline-990000?style=for-the-badge&logo=webgl&logoColor=white)](https://www.khronos.org/webgl/)
-[![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Swagger-85EA2D?style=for-the-badge&logo=openapiinitiative&logoColor=black)](http://localhost:3000/api-docs)
+[![OpenAPI 3.0](https://img.shields.io/badge/OpenAPI-3.0_Swagger-85EA2D?style=for-the-badge&logo=openapiinitiative&logoColor=black)](https://pureroute.onrender.com/api-docs)
 [![Leaflet](https://img.shields.io/badge/Leaflet-1.9_Maps-199900?style=for-the-badge&logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![Brevo](https://img.shields.io/badge/Brevo-Transactional_Email-0B996F?style=for-the-badge&logo=brevo&logoColor=white)](https://www.brevo.com/)
 
@@ -239,8 +239,9 @@ Telangana Geospatial Poisoning ──►  Regex boundaries: ^\+91[6-9]\d{9}$ & ^
 
 PureRoute features a fully documented REST backend complying with the OpenAPI 3.0 specification.
 
-* **Interactive Swagger UI**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
-* **Raw OpenAPI JSON**: [http://localhost:3000/api/openapi.json](http://localhost:3000/api/openapi.json)
+* **Interactive Swagger UI (Production)**: [https://pureroute.onrender.com/api-docs](https://pureroute.onrender.com/api-docs) (or proxied at [https://purelocalmilk.netlify.app/api-docs](https://purelocalmilk.netlify.app/api-docs))
+* **Interactive Swagger UI (Local)**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+* **Raw OpenAPI JSON**: [https://pureroute.onrender.com/api/openapi.json](https://pureroute.onrender.com/api/openapi.json)
 
 ### Core Endpoints Overview
 
@@ -382,7 +383,7 @@ npm run dev
 
 Visit the application in your browser:
 * 🌐 **Application Portal**: [http://localhost:3000](http://localhost:3000)
-* 📖 **OpenAPI 3.0 Swagger UI**: [http://localhost:3000/api-docs](http://localhost:3000/api-docs)
+* 📖 **OpenAPI 3.0 Swagger UI**: [https://pureroute.onrender.com/api-docs](https://pureroute.onrender.com/api-docs) (or local: [http://localhost:3000/api-docs](http://localhost:3000/api-docs))
 
 ---
 

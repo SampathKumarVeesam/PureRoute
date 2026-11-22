@@ -12,8 +12,20 @@ export const openApiSpec = {
   },
   servers: [
     {
+      url: 'https://pureroute.onrender.com',
+      description: 'Production Render Backend',
+    },
+    {
+      url: 'https://purelocalmilk.netlify.app',
+      description: 'Production Netlify Edge (Proxied)',
+    },
+    {
+      url: 'http://localhost:3000',
+      description: 'Local Development Server',
+    },
+    {
       url: '/',
-      description: 'Active PureRoute Server',
+      description: 'Current Host Origin',
     },
   ],
   tags: [
