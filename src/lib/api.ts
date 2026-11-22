@@ -51,8 +51,8 @@ export const SWAGGER_URL =
   typeof window !== 'undefined' &&
   window.location.hostname !== 'localhost' &&
   window.location.hostname !== '127.0.0.1'
-    ? 'https://pureroute.onrender.com/api-docs'
-    : '/api-docs';
+    ? 'https://pureroute.onrender.com/api-docs/'
+    : '/api-docs/';
 
 async function request<T>(path: string, init: RequestInit = {}): Promise<T> {
   const headers = new Headers(init.headers);

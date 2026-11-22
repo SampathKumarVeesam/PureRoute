@@ -1,4 +1,6 @@
-/api-docs*  https://pureroute.onrender.com/api-docs:splat  200!
-/docs*      https://pureroute.onrender.com/docs:splat      200!
-/api/*      https://pureroute.onrender.com/api/:splat       200!
-/*          /index.html                                     200
+/api-docs   https://pureroute.onrender.com/api-docs/       301!
+/api-docs/* https://pureroute.onrender.com/api-docs/:splat 200!
+/docs       https://pureroute.onrender.com/api-docs/       301!
+/docs/*     https://pureroute.onrender.com/docs/:splat     200!
+/api/*      https://pureroute.onrender.com/api/:splat      200!
+/*          /index.html                                    200
